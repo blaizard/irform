@@ -1,0 +1,41 @@
+<html>
+	<head>
+		<script src="jquery-3.1.0.min.js"></script>
+		<script src="../srcs/irform.js"></script>
+		<script src="../srcs/jquery.irform-tinymce.js"></script>
+		<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css"/>
+		<!--<script src="../irform.min.js"></script>//-->
+		<script src="tinymce/js/tinymce/tinymce.min.js"></script>
+	</head>
+	<body>
+		<form id="example1">
+			<textarea id="example1-textarea" name="test">Easy (and free!) You should check out our premium features.</textarea>
+			<br>
+			<button type="button" onclick="irformGet_example1()">Irform.get</button><br>
+			<button type="button" onclick="irformSet_example1()">Irform.set</button><br>
+		</form>
+		<script>
+			$("#example1-textarea").irformTinymce({
+				name: "text",
+				tinymceBase: "tinymce/js/tinymce"
+			});
+
+			function irformGet_example1()
+			{
+				var result = Irform.get("#example1");
+				console.log(result);
+			}
+			function irformSet_example1()
+			{
+				Irform.set("#example1", {test: "<b>Hello</b><br/>World!!!!"});
+			}
+		</script>
+		<button type="button" onclick="irformClear_example()">Irform.clear</button><br>
+		<script>
+			function irformClear_example()
+			{
+				Irform.clear("body");
+			}
+		</script>
+	</body>
+</html>
