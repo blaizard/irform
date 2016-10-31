@@ -4,15 +4,16 @@
 	font-family: "Lucida Sans Unicode", "Lucida Grande", "sans-serif";
 	font-size: 14px;
 	line-height: 16px;
-	color: #111;
 	margin: 0px;
 	padding: 0px;
 	white-space: nowrap;
 	box-sizing: border-box;
 	width: 100%;
 	vertical-align: middle;
-
 	padding: 0px 6px;
+}
+.irform {
+	color: #111;
 	background-color: #fff;
 }
 
@@ -267,4 +268,22 @@ textarea.success,
 .irform.disable {
 	background-color: #eee;
 	color: #777;
+}
+
+/* Modal */
+.irform-modal {
+	background-color: rgba(0, 0, 0, 0.5);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.irform-modal-content {
+	padding: 30px 30px;
+	background-color: #fff;
+	max-height: 80%;
+	max-width: 80%;
+	min-height: 200px;
+	min-width: 400px;
+	overflow: auto;
+	border-radius: 5px;
 }

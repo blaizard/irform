@@ -189,11 +189,13 @@
 			menubar: false,
 			statusbar: false,
 			autoresize_max_height: ($(window).innerHeight() - 100), //< For the toolbar
-			toolbar: "undo redo | styleselect | bold italic | forecolor | removeformat | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media table | code | fullscreen",
+			toolbar: "undo redo | styleselect | bold italic | forecolor | removeformat | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | codesample link image media table | code | fullscreen",
 			plugins: [ "advlist autolink autoresize link image lists charmap print preview hr anchor pagebreak spellchecker",
 				"searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking",
-				"save table contextmenu directionality emoticons template paste textcolor"
+				"save table contextmenu directionality emoticons template paste textcolor codesample"
 			]
+
+
 		},
 	};
 

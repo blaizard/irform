@@ -97,15 +97,21 @@ Irform.defaultOptions = {
 		},
 		submit: function(name, options) {
 			var button = document.createElement("button");
-			$(button).prop("type", "submit");
+			$(button).prop("type", "button");
 			$(button).prop("name", name);
 			$(button).addClass("irform");
 			$(button).text((typeof options.value === "string") ? options.value : "Submit");	
 			var obj = this;
 			$(button).click(function() {
 				var values = obj.get();
-				if (values !== false && typeof options.callback === "string") {
+				if (values == false) {
+					return;
+				}
+				if (typeof options.callback === "function") {
 					options.callback.call(obj, values);
+				}
+				else if ($(obj.container).is("form")) {
+					$(obj.container).get(0).submit();
 				}
 			});
 			return button;
@@ -114,10 +120,11 @@ Irform.defaultOptions = {
 			var select = document.createElement("select");
 			$(select).prop("name", name);
 			$(select).addClass("irform");
+			var list = options["select"];
 			for (var name in options["select"]) {
 				var opt = document.createElement("option");
-				$(opt).text(options["select"][name]);
-				$(opt).prop("value", name);
+				$(opt).text(list[name]);
+				$(opt).prop("value", (list instanceof Array) ? list[name] : name);
 				$(select).append(opt);
 			}
 			return select;

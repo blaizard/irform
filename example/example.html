@@ -8,6 +8,8 @@
 		<script src="../srcs/jquery.irform-file.js"></script>
 		<script src="../srcs/irform.irexplorer.js"></script>
 
+		<script src="../srcs/jquery.irform-modal.js"></script>
+
 		<link rel="stylesheet" type="text/css" href="../theme/default/icon.css"/>
 		<link rel="stylesheet" type="text/css" href="../theme/default/irform.css"/>
 <!--
@@ -24,9 +26,10 @@
 
 
 		<script src="tinymce.keyword.plugin.js"></script>
+		<script src="tinymce.inlinecode.plugin.js"></script>
 	</head>
 	<body>
-		<div id="myForm"></div>
+		<form id="myForm" action="register.php" method="get"></form>
 		<script>
 			var irform = new Irform("#myForm", [
 			    {name: "username", caption: "Username", type: "input", required: true, validate: Irform.EMAIL},
@@ -70,12 +73,17 @@
 		</script>
 		<h1>Irform().create(...)</h1>
 
+		<div id="test">Hello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br></div>
+
 		<form id="example2"></form>
 		<button type="button" onclick="irformGet_example2()">Irform.get</button><br>
 		<button type="button" onclick="irformSet_example2()">Irform.set</button><br>
 		<button type="button" onclick="irform_toggle_enable()">Enable/Disable</button><br>
 		<button type="button" onclick="irformUpdate_example2()">Irform.update</button><br>
 		<script>
+			$("#test").irformModal();
+
+
 			var formDescription = [
 				{name: "array", caption: "Array", type: "array"},
 				{name: "test", caption: "Test", type: "input"},
