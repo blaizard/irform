@@ -23,7 +23,7 @@ var IrformFileIrexplorer = function(callback, presetOptions) {
 /* Override default options */
 $().irformTinymce.defaults.callbackBrowser = function(type, callback) {
 	/* Change the mode */
-	mode = "file";
+	var mode = "file";
 	switch (type) {
 	case "image":
 		mode = "image";

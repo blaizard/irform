@@ -31,8 +31,10 @@
 	/**
 	 * This function handles a single object.
 	 * \private
+	 * \param arg
+	 * \param data
 	 */
-	$.fn.irformFile.x = function(arg, data) {
+	$.fn.irformFile.x = function(arg) {
 		/* Load the default options */
 		var options = $.fn.irformFile.defaults;
 

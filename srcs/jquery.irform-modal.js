@@ -28,8 +28,10 @@
 	/**
 	 * This function handles a single object.
 	 * \private
+	 * \param arg
+	 * \param data
 	 */
-	$.fn.irformModal.x = function(arg, data) {
+	$.fn.irformModal.x = function(arg) {
 		/* Load the default options */
 		var options = $.fn.irformModal.defaults;
 
@@ -100,7 +102,7 @@
 
 		// Remove the element on click
 		var obj = this;
-		$(container).click(function(e) {
+		$(container).click(function() {
 			$.fn.irformModal.close.call(obj);
 		});
 

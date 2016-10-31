@@ -9,9 +9,6 @@ ALL_RULES := $(shell test -s config.mk && cat config.mk | grep -e '^minify_\|^di
 # Predefined rules
 all: check $(ALL_RULES)
 build: all
-rebuild:
-		@+make --no-print-directory clean
-		@+make --no-print-directory build
 silent: VERBOSE := 0
 silent: check $(ALL_RULES)
 verbose: VERBOSE := 2
@@ -44,7 +41,7 @@ PACK_CMD := zip
 
 # Flags
 PRINT_FLAGS :=
-MINIFY_JS_FLAGS := -c -m -v
+MINIFY_JS_FLAGS := -c -m -v --lint
 MINIFY_CSS_FLAGS :=
 CONCAT_FLAGS :=
 MKDIR_FLAGS := -p
@@ -200,6 +197,11 @@ check_minify: check
 clean:
 	$(call RMDIR,$(TEMPDIR)/)
 	$(call RMDIR,$(DISTDIR)/)
+
+# Clean and re-build the targets
+rebuild:
+	@+make --no-print-directory clean
+	@+make --no-print-directory build
 
 # Re-build all what is inside the dist directory and make a package of it all
 release:

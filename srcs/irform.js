@@ -104,7 +104,7 @@ Irform.defaultOptions = {
 			var obj = this;
 			$(button).click(function() {
 				var values = obj.get();
-				if (values == false) {
+				if (values === false) {
 					return;
 				}
 				if (typeof options.callback === "function") {
@@ -136,8 +136,11 @@ Irform.defaultOptions = {
 	defaultType: "input",
 	/**
 	 * The wrapper to go around the field and keep a common consistency
+	 * \param elt
+	 * \param options
+	 * \param name
 	 */
-	wrapper: function(elt, options, name) {
+	wrapper: function(elt, options/*, name*/) {
 		var wrapper = document.createElement("div");
 		var div = document.createElement("div");
 		$(div).addClass("irform-caption");
@@ -172,8 +175,10 @@ Irform.defaultOptions = {
 	},
 	/**
 	 * Called once an item has been validated successfully
+	 * \param item
+	 * \param name
 	 */
-	callbackSuccess: function(item, name) {
+	callbackSuccess: function(item/*, name*/) {
 		$(item).removeClass("error").addClass("success");
 	},
 	/**
@@ -348,7 +353,6 @@ Irform.prototype.create = function (container, formDescription) {
  * Disable all elements of the form
  */
 Irform.prototype.disable = function () {
-	var obj = this;
 	var disable_fct = this.options.disable;
 	this.each(function(item) {
 		disable_fct.call(this, true, item);
@@ -359,7 +363,6 @@ Irform.prototype.disable = function () {
  * Enable all elements of the form
  */
 Irform.prototype.enable = function () {
-	var obj = this;
 	var disable_fct = this.options.disable;
 	this.each(function(item) {
 		disable_fct.call(this, false, item);
@@ -476,7 +479,7 @@ Irform.prototype.set = function (values) {
 	var nameUsed = {};
 	do {
 		var isValueSet = false;
-		Irform.set(this.container, values, function(key, value) {
+		Irform.set(this.container, values, function(key) {
 			/* This value has already been set, continue */
 			if (typeof nameUsed[key] !== "undefined") {
 				return null;

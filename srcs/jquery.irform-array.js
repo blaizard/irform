@@ -210,12 +210,12 @@
 		$(obj).append(content);
 
 		/* Set an event to add new items */
-		$(obj).on("array-add", function(event) {
+		$(obj).on("array-add", function() {
 			$.fn.irformArray.add.call(obj);
 		});
 
 		/* Set an event to clear all items */
-		$(obj).on("array-empty", function(event) {
+		$(obj).on("array-empty", function() {
 			$.fn.irformArray.clear.call(obj);
 		});
 
@@ -287,8 +287,9 @@
 		down: "<button class=\"irform dock-left dock-right\" type=\"button\"><span class=\"icon-arrow-down\"></span></button>",
 		/**
 		 * Hook called once an item has been added
+		 * \param item
 		 */
-		hookAdd: function(item) {},
+		hookAdd: function(/*item*/) {},
 		/**
 		 * Hook called once the element value is writen to it.
 		 */

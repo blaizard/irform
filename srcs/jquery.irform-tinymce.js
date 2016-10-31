@@ -31,8 +31,10 @@
 	/**
 	 * This function handles a single object.
 	 * \private
+	 * \param arg
+	 * \param data
 	 */
-	$.fn.irformTinymce.x = function(arg, data) {
+	$.fn.irformTinymce.x = function(arg/*, data*/) {
 		/* Load the default options */
 		var options = $.fn.irformTinymce.defaults;
 
@@ -86,25 +88,25 @@
 			$(this).attr("id", "irform-tinymce-id" + ($.fn.irformTinymce.create.id++));
 		}
 
-		/* Update the options */
+		// Update the options
 		var tinymce_o = $.extend(true, {
 			selector: "#" + $(this).attr("id"),
-			/* Do not convert URLs */
+			// Do not convert URLs
 			convert_urls: false,
-			/* To support the custom browser */
-			file_browser_callback: function (field_name, url, type, win) {
+			// To support the custom browser function (field_name, url, type, win)
+			file_browser_callback: function (field_name, url, type) {
 				/* Call the browser */
 				options.callbackBrowser.call(obj, type, function(path) {
 					$("#" + field_name).val(path);
 				});
 			},
-			/* Call this function once the editor is ready */
+			// Call this function once the editor is ready
 			init_instance_callback: function() {
-				/* Call the callback to tell that the editor is ready */
+				// Call the callback to tell that the editor is ready
 				options.callbackIsReady.call(obj);
 			},
 			setup : function(editor) {
-				editor.on('change', function(e) {
+				editor.on('change', function() {
 					$(obj).trigger("change");
 				});
 			}
@@ -180,7 +182,7 @@
 		 * \param callback the function to be called once the value is available. This function takes into argument
 		 * the path
 		 */
-		callbackBrowser: function(type, callback) {},
+		callbackBrowser: function() {},
 		/**
 		 * Default options to be passed to tinymce
 		 */
