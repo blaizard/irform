@@ -50,7 +50,7 @@ CONCAT_FLAGS :=
 MKDIR_FLAGS := -p
 RMDIR_FLAGS := -rfd
 COPY_FLAGS := -R
-PACK_FLAGS := -o
+PACK_FLAGS := -o -r
 
 # Available colors
 COLOR_END := "\033[0m"
@@ -174,6 +174,7 @@ help:
 	@printf "\tclean\t\tClean the environment and all generated files.\n"
 	@printf "\tbuild\t\tBuild the targets.\n"
 	@printf "\trebuild\t\tClean and re-build the targets.\n"
+	@printf "\trelease\t\tRe-build the targets and generate the package.\n"
 	@printf "\n"
 	@printf "Configuration: config.mk\n"
 	@printf "\tContains all user rules definitions. They use pre-made\n"
