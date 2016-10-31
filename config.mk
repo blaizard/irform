@@ -27,3 +27,6 @@ minify_bootstrapjs: SRCS := $(BASE_SRCS) \
 
 # Stamp text to apply to each files
 STAMP_TXT = $(OUTPUT) (`date +'%Y.%m.%d'`) by Blaise Lengrand
+
+# Package name
+PACKAGE := irform.zip

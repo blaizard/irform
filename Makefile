@@ -3,9 +3,6 @@
 
 -include config.mk
 
-# Add the following header to the generated files
-STAMP_TXT ?= $(OUTPUT) (`date +'%Y.%m.%d'`)
-
 # List all available targets (starting with 'target_*')
 ALL_RULES := $(shell test -s config.mk && cat config.mk | grep -e '^minify_\|^dist_' |  awk -F':' '{print $$1}' | uniq)
 
@@ -24,9 +21,11 @@ verbose: check $(ALL_RULES)
 .SECONDARY:
 # Use of rule-specific variables
 .SECONDEXPANSION:
-.PHONY: all check silent verbose help build rebuild
+.PHONY: all check silent verbose help build rebuild release
 
 # Default values
+PACKAGE ?= package.zip
+STAMP_TXT ?= $(OUTPUT) (`date +'%Y.%m.%d'`)
 SRCS := 
 OUTPUT := 
 VERBOSE := 1
@@ -41,6 +40,7 @@ CONCAT_CMD := cat
 MKDIR_CMD := mkdir
 RMDIR_CMD := rm
 COPY_CMD := cp
+PACK_CMD := zip
 
 # Flags
 PRINT_FLAGS :=
@@ -50,6 +50,7 @@ CONCAT_FLAGS :=
 MKDIR_FLAGS := -p
 RMDIR_FLAGS := -rfd
 COPY_FLAGS := -R
+PACK_FLAGS := -o
 
 # Available colors
 COLOR_END := "\033[0m"
@@ -73,15 +74,15 @@ AT = $(AT_V$(VERBOSE))
 COMMA := ,
 # Updated commands
 define MINIFY_JS
-$(call MSG,MINIFYJS,GREEN,$^);
+$(call MSG,MINJS,GREEN,$^);
 $(AT)$(MINIFY_JS_CMD) $(MINIFY_JS_FLAGS) $1 -o $2;
 endef
 define MINIFY_CSS
-$(call MSG,MINIFYCSS,GREEN,$^);
+$(call MSG,MINCSS,GREEN,$^);
 $(AT)$(MINIFY_CSS_CMD) $(MINIFY_CSS_FLAGS) $1 > $2;
 endef
 define CONCAT
-$(call MSG,CONCAT,GREEN,$1);
+$(call MSG,CONCAT,GREEN,$2);
 $(AT)$(CONCAT_CMD) $(CONCAT_FLAGS) $1 > $2;
 endef
 define MKDIR
@@ -91,8 +92,12 @@ define RMDIR
 $(if $(shell test -d $1 && echo 1),$(call MSG,RMDIR,CYAN,$1);$(RMDIR_CMD) $(RMDIR_FLAGS) $1,)
 endef
 define COPY
-$(call MSG,COPY,GREEN,$1);
+$(call MSG,COPY,CYAN,$1);
 $(AT)$(COPY_CMD) $(COPY_FLAGS) $1 $2;
+endef
+define PACK
+$(call MSG,PACK,CYAN,$2);
+$(AT)$(PACK_CMD) $(PACK_FLAGS) $2 $1 >/dev/null;
 endef
 define STAMP
 $(call MSG,STAMP,GREEN,$1);
@@ -120,27 +125,36 @@ define CHECK_TOOL
 $(if $(shell command -v $1 2>/dev/null),$(call MSG,CHECK,CYAN,$1),$(call ERROR,$2))
 endef
 
+# Checks if a file exists
+# Params:
+#   1. File
+#   2. Message
+#   3. (optional) Action to perform if it does not exists
+define CHECK_FILE
+$(if $(shell test -s $1 && echo 1),,$(shell $(if $(value 3),$3)))
+$(if $(shell test -s $1 && echo 1),$(call MSG,CHECK,CYAN,$1),$(call ERROR,$2))
+endef
+
 # Print a formated message
 #
 # Params:
 #   1. Type
-#   1. Color (any available colors from COLOR_*)
-#   2. Message
-#msgaf="$3" | cut-c 1-80
+#   2. Color (any available colors from COLOR_*)
+#   3. Message
+#   4. (optional) If set, the message will not be trunc
 MSG_TRUNCATE_V0 =
 MSG_TRUNCATE_V1 = $(if $(shell test 80 -gt $(shell printf "%s" "$3" | wc -m) && echo 1),$3,$(shell printf "%s" "$3" | cut -c 1-80)...)
 MSG_TRUNCATE_V2 = $3
-MSG_TRUNCATE = $(MSG_TRUNCATE_V$(VERBOSE))
+MSG_TRUNCATE = $(strip $(MSG_TRUNCATE_V$(VERBOSE)))
 define MSG
-$(PRINT) $(COLOR_DARK_GRAY)$(DISTDIR)/$(OUTPUT)$(COLOR_END)"\t"$(COLOR_$2)$1$(COLOR_END)"\t$(MSG_TRUNCATE)\n"
+$(PRINT) $(COLOR_END)$(COLOR_$2)$1$(COLOR_END)"\t\t$(if $(value 4),$3,$(MSG_TRUNCATE))\n"
 endef
 
 # Print an error message and exit
-#
 # Params:
 #   1. Error message to print.
 define ERROR
-$(call MSG,ERROR,RED, "$(COLOR_RED)"$1$(COMMA) abort."$(COLOR_END)")
+$(call MSG,ERROR,RED,"$(COLOR_RED)"$(strip $1)$(COMMA) abort."$(COLOR_END)",1)
 @exit 1
 endef
 
@@ -172,7 +186,9 @@ help:
 
 # Check that all prerequired conditions are there
 check:
-#	@test -s config.mk || { make --no-print-directory help 2>/dev/null | sed 's/.*/#\0/' > config.mk; $(call ERROR, 'config.mk' does not exists or is empty$(COMMA) an empty template has been created); }
+	$(call CHECK_FILE, config.mk, \
+			'config.mk' does not exists or is empty$(COMMA) an empty template has been created, \
+			make --no-print-directory help 2>/dev/null | sed 's/.*/#\0/' > config.mk)
 	$(call CHECK_DEFINED, ALL_RULES, 'config.mk' contains no rules)
 
 check_minify: check
@@ -183,6 +199,12 @@ check_minify: check
 clean:
 	$(call RMDIR,$(TEMPDIR)/)
 	$(call RMDIR,$(DISTDIR)/)
+
+# Re-build all what is inside the dist directory and make a package of it all
+release:
+	$(call RMDIR,$(DISTDIR)/)
+	@+make --no-print-directory build
+	$(call PACK,$(DISTDIR)/*,$(DISTDIR)/$(PACKAGE))
 
 # Available source types for the target
 SRCS_JS = $(filter %.js,$(SRCS))
