@@ -122,7 +122,14 @@ endef
 #   1. Type
 #   1. Color (any available colors from COLOR_*)
 #   2. Message
-MSG = $(PRINT) $(COLOR_DARK_GRAY)$(DISTDIR)/$(OUTPUT)$(COLOR_END)"\t"$(COLOR_$2)$1$(COLOR_END)"\t$3\n"
+#msgaf="$3" | cut-c 1-80
+MSG_TRUNCATE_V0 =
+MSG_TRUNCATE_V1 = $(if $(shell test 80 -gt $(shell printf "%s" "$3" | wc -m) && echo 1),$3,$(shell printf "%s" "$3" | cut -c 1-80)...)
+MSG_TRUNCATE_V2 = $3
+MSG_TRUNCATE = $(MSG_TRUNCATE_V$(VERBOSE))
+define MSG
+$(PRINT) $(COLOR_DARK_GRAY)$(DISTDIR)/$(OUTPUT)$(COLOR_END)"\t"$(COLOR_$2)$1$(COLOR_END)"\t$(MSG_TRUNCATE)\n"
+endef
 
 # Print an error message and exit
 #
