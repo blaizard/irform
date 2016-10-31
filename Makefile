@@ -11,6 +11,10 @@ ALL_RULES := $(shell test -s config.mk && cat config.mk | grep -e '^minify_\|^di
 
 # Predefined rules
 all: check $(ALL_RULES)
+build: all
+rebuild:
+		@+make --no-print-directory clean
+		@+make --no-print-directory build
 silent: VERBOSE := 0
 silent: check $(ALL_RULES)
 verbose: VERBOSE := 2
@@ -20,7 +24,7 @@ verbose: check $(ALL_RULES)
 .SECONDARY:
 # Use of rule-specific variables
 .SECONDEXPANSION:
-.PHONY: all check silent verbose help
+.PHONY: all check silent verbose help build rebuild
 
 # Default values
 SRCS := 
@@ -98,7 +102,7 @@ endef
 # Check that given variables are set and all have non-empty values,
 # die with an error otherwise.
 # Params:
-#   1. Variable name(s) to test.
+#   1. Variable name to test.
 #   2. (optional) Error message to print.
 CHECK_DEFINED = \
 	$(strip $(foreach 1,$1, \
@@ -154,6 +158,8 @@ help:
 	@printf "\tverbose\t\tHigh verbosity, including command executed.\n"
 	@printf "\thelp\t\tDisplay this help message.\n"
 	@printf "\tclean\t\tClean the environment and all generated files.\n"
+	@printf "\tbuild\t\tBuild the targets.\n"
+	@printf "\trebuild\t\tClean and re-build the targets.\n"
 	@printf "\n"
 	@printf "Configuration: config.mk\n"
 	@printf "\tContains all user rules definitions. They use pre-made\n"
@@ -166,10 +172,10 @@ help:
 
 # Check that all prerequired conditions are there
 check:
-#	@test -s config.mk || { make help 2>/dev/null | sed 's/.*/#\0/' > config.mk; $(call ERROR, 'config.mk' does not exists or is empty$(COMMA) an empty template has been created); }
+#	@test -s config.mk || { make --no-print-directory help 2>/dev/null | sed 's/.*/#\0/' > config.mk; $(call ERROR, 'config.mk' does not exists or is empty$(COMMA) an empty template has been created); }
 	$(call CHECK_DEFINED, ALL_RULES, 'config.mk' contains no rules)
 
-check_minify:
+check_minify: check
 	$(call CHECK_TOOL, $(MINIFY_JS_CMD), "Please install: sudo apt-get install npm && sudo npm install --global uglifyjs && uglifyjs --version")
 	$(call CHECK_TOOL, $(MINIFY_CSS_CMD), "Please install: sudo apt-get install npm && sudo npm install --global uglifycss && uglifycss --version")
 
