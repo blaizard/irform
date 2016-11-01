@@ -7,18 +7,18 @@
 ALL_RULES := $(shell test -s config.mk && cat config.mk | grep -e '^minify_\|^dist_' |  awk -F':' '{print $$1}' | uniq)
 
 # Predefined rules
-all: check $(ALL_RULES)
+all: config.mk $(ALL_RULES)
 build: all
 silent: VERBOSE := 0
-silent: check $(ALL_RULES)
+silent: config.mk $(ALL_RULES)
 verbose: VERBOSE := 2
-verbose: check $(ALL_RULES)
+verbose: config.mk $(ALL_RULES)
 
 # Prevent makefile auto-clean
 .SECONDARY:
 # Use of rule-specific variables
 .SECONDEXPANSION:
-.PHONY: all check silent verbose help build rebuild release
+.PHONY: all silent verbose help build rebuild release
 
 # Default values
 PACKAGE ?= package.zip
@@ -71,11 +71,11 @@ AT = $(AT_V$(VERBOSE))
 COMMA := ,
 # Updated commands
 define MINIFY_JS
-$(call MSG,MINJS,GREEN,$^);
+$(call MSG,MINJS,GREEN,$2);
 $(AT)$(MINIFY_JS_CMD) $(MINIFY_JS_FLAGS) $1 -o $2;
 endef
 define MINIFY_CSS
-$(call MSG,MINCSS,GREEN,$^);
+$(call MSG,MINCSS,GREEN,$2);
 $(AT)$(MINIFY_CSS_CMD) $(MINIFY_CSS_FLAGS) $1 > $2;
 endef
 define CONCAT
@@ -183,14 +183,18 @@ help:
 	@printf "\tminify_main: OUTPUT := hello.min.js\n"
 
 # Check that all prerequired conditions are there
-check:
+config.mk:
 	$(call CHECK_FILE, config.mk, \
 			'config.mk' does not exists or is empty$(COMMA) an empty template has been created, \
 			make --no-print-directory help 2>/dev/null | sed 's/.*/#\0/' > config.mk)
 	$(call CHECK_DEFINED, ALL_RULES, 'config.mk' contains no rules)
 
-check_minify: check
+# Check if JS minify tools are present
+check_minify_js:
 	$(call CHECK_TOOL, $(MINIFY_JS_CMD), "Please install: sudo apt-get install npm && sudo npm install --global uglifyjs && uglifyjs --version")
+
+# Check if CSS minify tools are present
+check_minify_css:
 	$(call CHECK_TOOL, $(MINIFY_CSS_CMD), "Please install: sudo apt-get install npm && sudo npm install --global uglifycss && uglifycss --version")
 
 # Clean-up the created directoried
@@ -216,7 +220,7 @@ SRCS_CSS = $(filter %.css,$(SRCS))
 SRCS_MIN_CSS = $(SRCS_CSS:%.css=$(TEMPDIR)/%.min.css)
 
 # Minify rule
-minify_%: check_minify $$(SRCS_MIN_JS) $$(SRCS_MIN_CSS)
+minify_%: $$(SRCS_MIN_JS) $$(SRCS_MIN_CSS)
 	$(call CHECK_DEFINED, SRCS, No sources specified)
 	$(call CHECK_DEFINED, OUTPUT, No output specified)
 	$(call MKDIR, `dirname "$(DISTDIR)/$(OUTPUT)"`/)
@@ -230,11 +234,11 @@ dist_%: $$(SRCS)
 	$(call COPY, $^, "$(DISTDIR)/$(OUTPUT)")
 
 # js files
-$(TEMPDIR)/%.min.js: %.js
+$(TEMPDIR)/%.min.js: check_minify_js %.js
 	$(call MKDIR, `dirname $@`/)
-	$(call MINIFY_JS, "$^", "$@")
+	$(call MINIFY_JS, $(lastword $^), "$@")
 
 # css files
-$(TEMPDIR)/%.min.css: %.css
+$(TEMPDIR)/%.min.css: check_minify_css %.css
 	$(call MKDIR, `dirname $@`/)
-	$(call MINIFY_CSS, "$^", "$@")
+	$(call MINIFY_CSS, $(lastword $^), "$@")
