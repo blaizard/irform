@@ -129,16 +129,19 @@
 		var options = $(this).data("irformArray");
 
 		var template = options.template;
-		var item = document.createElement("div");
-		$(item).addClass("irform-array-item");
+		var item = $("<div>", {
+			class: "irform-array-item"
+		});
 		if (options.inline) {
 			$(item).addClass("inline");
+			$(item).css("display", "inline-block");
 		}
 
 		/* Delete button */
 		if (options.isDelete) {
-			var del = document.createElement("div");
-			$(del).addClass("irform-array-item-del");
+			var del = $("<div>", {
+				class: "irform-array-item-del"
+			});
 			$(del).html(options.delete)
 			$(del).click(function() {
 				$.fn.irformArray.deleteItem.call(obj, item);
@@ -149,16 +152,18 @@
 		/* Move (Up/Down) button */
 		if (options.isMove) {
 			/* Button Up */
-			var up = document.createElement("div");
-			$(up).addClass("irform-array-item-up");
+			var up = $("<div>", {
+				class: "irform-array-item-up"
+			});
 			$(up).html(options.up);
 			$(up).click(function() {
 				$.fn.irformArray.moveItemUp.call(obj, item);
 			});
 			$(item).append(up);
 			/* Button Down */
-			var down = document.createElement("div");
-			$(down).addClass("irform-array-item-down");
+			var down = $("<div>", {
+				class: "irform-array-item-down"
+			});
 			$(down).html(options.down);
 			$(down).click(function() {
 				$.fn.irformArray.moveItemDown.call(obj, item);
@@ -166,8 +171,9 @@
 			$(item).append(down);
 		}
 
-		var content = document.createElement("div");
-		$(content).addClass("irform-array-item-content");
+		var content = $("<div>", {
+			class: "irform-array-item-content"
+		});
 		if (typeof template === "function") {
 			$(content).html(template.call(obj, item));
 		}
@@ -202,11 +208,10 @@
 		$(obj).attr("name", options.name);
 
 		/* Create the content array */
-		var content = document.createElement("div");
-		$(content).addClass("irform-array-content");
-		if (options.inline) {
-			$(content).css("display", "inline-block");
-		}
+		var content = $("<div>", {
+			class: "irform-array-content",
+			style: (options.inline) ? "display:inline-block;" : ""
+		});
 		$(obj).append(content);
 
 		/* Set an event to add new items */
@@ -221,12 +226,11 @@
 
 		/* Set the add button */
 		if (options.isAdd) {
-			var add = document.createElement("div");
-			$(add).addClass("irform-array-add");
+			var add = $("<div>", {
+				class: "irform-array-add",
+				style: (options.inline) ? "display:inline-block;" : ""
+			});
 			$(add).html(options.add);
-			if (options.inline) {
-				$(add).css("display", "inline-block");
-			}
 			$(add).click(function() {
 				/* Do nothing if this element is disabled */
 				if ($(obj).prop("disabled") === true) {
@@ -252,7 +256,7 @@
 		/**
 		 * The template to be used for the item
 		 */
-		template: "<input class=\"irform\" type=\"text\" />",
+		template: "<input class=\"irform\" type=\"text\" name=\"text\" />",
 		/**
 		 * Display the element items inline
 		 */
@@ -348,7 +352,7 @@
 
 /* Add the module to Irform */
 Irform.defaultOptions.fields.array = function(name, options) {
-	var div = document.createElement("div");
+	var div = $("<div>");
 	$(div).irformArray({
 		name: name,
 		template: options.template

@@ -15,12 +15,16 @@
  * \param [options] Options to be passed to the form, see \ref Irform.defaultOptions for more details.
  */
 var Irform = function (container, formDescription, options) {
-	this.container = container;
+	// Trigger require, to make sure that any pending modules are loaded
+	irRequire.trigger();
+	this.container = $(container);
 	this.formDescription = formDescription;
 	this.options = $.extend(true, {}, Irform.defaultOptions, options);
-	/* Empty the container first */
-	$(this.container).empty();
-	/* Create the form */
+	// Empty the container first
+	this.container.empty();
+	// Call the hook
+	this.options.hookInit.call(this);
+	// Create the form
 	this.create(container, formDescription);
 };
 
@@ -67,40 +71,92 @@ Irform.defaultOptions = {
 	 */
 	fields: {
 		input: function(name, options) {
-			var input = document.createElement("input");
-			$(input).prop("type", "text");
-			$(input).prop("name", name);
-			$(input).addClass("irform");
-			if (typeof options.placeholder === "string") {
-				$(input).prop("placeholder", options.placeholder);
+			return $("<input>", {
+				type: "text",
+				name: name,
+				class: "irform",
+				placeholder: options.placeholder
+			});
+		},
+		/**
+		 * \brief Create one or multiple checkbox field(s).
+		 *
+		 * options.list
+		 */
+		checkbox: function(name, options) {
+			var createCheckbox = function(name, label, inline) {
+				var container = $("<div>", {
+					class: (inline) ? "irform-inline" : ""
+				});
+				var input = $("<input>", {
+					type: "checkbox",
+					name: name,
+					class: "irform",
+					id: "irform-checkbox-" + (++Irform.unique)
+				});
+				$(container).append(input);
+				$(container).append("<label for=\"" + $(input).prop("id") + "\">" + label + "</label>");
+				return container;
+			};
+
+			if (!options.list) {
+				return createCheckbox(name, "", false);
 			}
-			return input;
+			if (options.list.length == 1) {
+				return createCheckbox(name, options.list[0], false);
+			}
+
+			var container = $("<div>", {
+				class: "irform-container",
+				name: name
+			});
+			var list = options.list;
+			for (var i in list) {
+				var checkbox = (list[i] instanceof Array) ?
+						createCheckbox(list[i][0], list[i][1], options.inline)
+						: createCheckbox(list[i], list[i], options.inline);
+				$(container).append(checkbox);
+			}
+
+			return container;
+		},
+		/*radio: fun*/
+		switch: function(name/*, options*/) {
+			var container = $("<div>", {
+				class: "irform irform-switch"
+			});
+			var input = $("<input>", {
+				type: "checkbox",
+				name: name,
+				class: "irform",
+				id: "irform-switch-" + (++Irform.unique)
+			});
+			$(container).append(input);
+			$(container).append("<label for=\"" + $(input).prop("id") + "\"></label>");
+			return container;
 		},
 		password: function(name, options) {
-			var input = document.createElement("input");
-			$(input).prop("type", "password");
-			$(input).prop("name", name);
-			$(input).addClass("irform");
-			if (typeof options.placeholder === "string") {
-				$(input).prop("placeholder", options.placeholder);
-			}
-			return input;
+			return $("<input>", {
+				type: "password",
+				name: name,
+				class: "irform",
+				placeholder: options.placeholder
+			});
 		},
 		textarea: function(name, options) {
-			var textarea = document.createElement("textarea");
-			$(textarea).prop("name", name);
-			$(textarea).addClass("irform");
-			if (typeof options.placeholder === "string") {
-				$(textarea).prop("placeholder", options.placeholder);
-			}
-			return textarea;
+			return $("<textarea>", {
+				name: name,
+				class: "irform",
+				placeholder: options.placeholder
+			});
 		},
 		submit: function(name, options) {
-			var button = document.createElement("button");
-			$(button).prop("type", "button");
-			$(button).prop("name", name);
-			$(button).addClass("irform");
-			$(button).text((typeof options.value === "string") ? options.value : "Submit");	
+			var button = $("<button>", {
+				type: "button",
+				name: name,
+				class: "irform",
+			});
+			$(button).text(options.value || "Submit");	
 			var obj = this;
 			$(button).click(function() {
 				var values = obj.get();
@@ -110,21 +166,52 @@ Irform.defaultOptions = {
 				if (typeof options.callback === "function") {
 					options.callback.call(obj, values);
 				}
-				else if ($(obj.container).is("form")) {
-					$(obj.container).get(0).submit();
+				else if (obj.container.is("form")) {
+					var form = $("<form>", {
+						action: $(obj.container).prop("action"),
+						method: $(obj.container).prop("method") || "POST",
+						enctype: "multipart/form-data"
+					});
+					// Re-create the data
+					var createDataRec = function(values, prefix) {
+						var data = "";
+						for (var name in values) {
+							if (typeof values[name] === "object") {
+								data += createDataRec(values[name],
+										((prefix) ? prefix + "[" + name + "]" : name));
+								// Cannot send an emty array via post, then if the array is empty, simply do not send it
+							}
+							else {
+								data += "<input name=\""
+										+ ((prefix) ? prefix + "[" + name + "]" : name)
+										+ "\" value=\"" + (values[name] + "").replace(/"/g, '&quot;') + "\"/>";
+								// POST converts all types to string, so no need to make special cases
+							}
+						}
+						return data;
+					};
+					var data = createDataRec(values, "");
+					$(form).html(data);
+					// Note: file upload works only with POST and enctype="multipart/form-data"
+					$(obj.container).find("input[type=file]").each(function() {
+						$(this).appendTo(form);
+					});
+					form.submit();
 				}
 			});
 			return button;
 		},
 		select: function(name, options) {
-			var select = document.createElement("select");
-			$(select).prop("name", name);
-			$(select).addClass("irform");
-			var list = options["select"];
-			for (var name in options["select"]) {
-				var opt = document.createElement("option");
+			var select = $("<select>", {
+				name: name,
+				class: "irform"
+			});
+			var list = options["list"];
+			for (var name in list) {
+				var opt = $("<option>", {
+					value: (list instanceof Array) ? list[name] : name
+				});
 				$(opt).text(list[name]);
-				$(opt).prop("value", (list instanceof Array) ? list[name] : name);
 				$(select).append(opt);
 			}
 			return select;
@@ -141,12 +228,14 @@ Irform.defaultOptions = {
 	 * \param name
 	 */
 	wrapper: function(elt, options/*, name*/) {
-		var wrapper = document.createElement("div");
-		var div = document.createElement("div");
-		$(div).addClass("irform-caption");
+		var wrapper = $("<div>");
+		var div = $("<div>", {
+			class: "irform-caption"
+		});
 		$(div).text(options.caption);
-		var value = document.createElement("div");
-		$(value).addClass("irform-elements");
+		var value = $("<div>", {
+			class: "irform-elements"
+		});
 		$(value).append(elt);
 		$(wrapper).append(div);
 		$(wrapper).append(value);
@@ -197,7 +286,11 @@ Irform.defaultOptions = {
 		Irform.queue(item, function() {
 			$(item).trigger((isDisabled) ? "disable" : "enable");
 		});
-	}
+	},
+	/**
+	 * Hook called during the initialization phase
+	 */
+	hookInit: function() {}
 };
 
 Irform.validate = function (presets, value) {
@@ -251,10 +344,10 @@ Irform.prototype.create = function (container, formDescription) {
 		Irform.unique = 0;
 	}
 	for (var i in formDescription) {
-		/* Save as local to pass it through callbacks */
+		// Save as local to pass it through callbacks
 		var obj = this;
 		var itemOptions = $.extend({
-			name: "irform" + (Irform.unique++),
+			name: "irform" + (++Irform.unique),
 			type: this.options.defaultType,
 			required: false,
 			validate: null,
@@ -267,25 +360,25 @@ Irform.prototype.create = function (container, formDescription) {
 		var itemName = itemOptions.name;
 		// Assign everything back, this must be done due to the automatically generated name
 		formDescription[i] = itemOptions;
-		/* Generate the element */
+		// Generate the element
 		var type = itemOptions["type"];
 		if (typeof this.options.fields[type] !== "function") {
 			console.log("'" + type + "' is not supported");
 			continue;
 		}
 		var containerItem = this.options.fields[type].call(this, itemName, itemOptions, function() {
-			/* Remove the pending tag and execute all the pending items in the queue */
+			// Remove the pending tag and execute all the pending items in the queue
 			$(this).removeClass("irform-pending");
 			Irform.queue(this);
 		});
 		var nameHolder = Irform.findNameHolder(containerItem, itemName);
-		/* Define the on-change function */
+		// Define the on-change function
 		$(nameHolder).on("change", function() {
 			var value = $(this).val();
 			var item = $(this).parents(".irform-item:first");
 			var itemOptions = $(item).data("irform");
 			var name = $(this).prop("name");
-			/* If there is a validate condition */
+			// If there is a validate condition
 			if (value && itemOptions.validate) {
 				if (obj.validate(item, value)) {
 					obj.options.callbackSuccess.call(obj, item, name);
@@ -294,21 +387,21 @@ Irform.prototype.create = function (container, formDescription) {
 					obj.options.callbackError.call(obj, [{type: "validation", item: item, name: name, options: itemOptions}]);
 				}
 			}
-			/* Validate also if the item is required and the value is non-empty */
+			// Validate also if the item is required and the value is non-empty
 			else if (value && $(item).hasClass("required")) {
 				obj.options.callbackSuccess.call(obj, item, name);
 			}
-			/* If there is no onchange, mean there is no extra form */
+			// If there is no onchange, mean there is no extra form
 			if (typeof itemOptions.onchange !== "object") {
 				return;
 			}
-			/* Delete all the sub entry from this */
+			// Delete all the sub entry from this
 			if ($(this).data("nextElement")) {
 				$(item).nextUntil($(this).data("nextElement")).remove();
 			}
-			/* Save the value of the next element */
+			// Save the value of the next element
 			$(this).data("nextElement", $(item).next());
-			/* Then add a new element */
+			// Then add a new element
 			if (typeof itemOptions.onchange[value] === "object") {
 				obj.create(item, itemOptions.onchange[value]);
 			}
@@ -316,33 +409,33 @@ Irform.prototype.create = function (container, formDescription) {
 				obj.create(item, itemOptions.onchange["__default__"]);
 			}
 		});
-		/* Insert the wrapper */
+		// Insert the wrapper
 		var item = this.options.wrapper.call(this, containerItem, itemOptions, itemName);
 		$(item).addClass("irform-item");
-		/* Associate the name of the element with the element */
+		// Associate the name of the element with the element
 		$(item).attr("data-irform", itemName);
-		/* Check if it has to be set has required */
+		// Check if it has to be set has required
 		if (itemOptions.required) {
 			$(item).addClass("required");
 		}
-		/* Set flags if needed */
+		// Set flags if needed
 		if (itemOptions.disabled) {
 			Irform.queue(nameHolder, function() {
 				obj.options.disable.call(obj, true, $(this).parents(".irform-item:first"));
 			});
 		}
-		/* Save data to this element */
+		// Save data to this element
 		$(item).data("irform", itemOptions);
-		/* Paste it on the DOM */
+		// Paste it on the DOM
 		($(container).hasClass("irform-item")) ? $(container).after(item) : $(container).append(item);
 	}
 
-	/* Trigger change to all items */
+	// Trigger change to all items
 	for (var i in formDescription) {
 		var itemName = formDescription[i].name;
-		/* Check the element */
-		var nameHolder = Irform.findNameHolder(container, itemName);
-		/* Trigger a value change to add new items if needed */
+		// Check the element
+		var nameHolder = Irform.findNameHolder(this.container, itemName);
+		// Trigger a value change to add new items if needed
 		Irform.queue(nameHolder, function() {
 			$(this).trigger("change");
 		});
@@ -374,7 +467,7 @@ Irform.prototype.enable = function () {
  */
 Irform.prototype.update = function (formDescription) {
 	var values = this.get(function() {}, true);
-	$(this.container).empty();
+	this.container.empty();
 	this.formDescription = formDescription;
 	this.create(this.container, formDescription);
 	this.set(values);
@@ -414,7 +507,7 @@ Irform.prototype.validate = function (item, value) {
  */
 Irform.prototype.each = function (callback) {
 	var obj = this;
-	$(this.container).find(".irform-item").each(function() {
+	this.container.find(".irform-item").each(function() {
 		callback.call(obj, this);
 	});
 };
@@ -480,7 +573,7 @@ Irform.prototype.set = function (values) {
 	do {
 		var isValueSet = false;
 		Irform.set(this.container, values, function(key) {
-			/* This value has already been set, continue */
+			// This value has already been set, continue
 			if (typeof nameUsed[key] !== "undefined") {
 				return null;
 			}
@@ -494,7 +587,7 @@ Irform.prototype.set = function (values) {
  * Update the form description
  */
 Irform.queue = function (item, action) {
-	/* Add an item to the queue or execute it */
+	// Add an item to the queue or execute it
 	if (typeof action === "function") {
 		if ($(item).hasClass("irform-pending")) {
 			var queue = $(item).data("irform-queue") || [];
@@ -505,7 +598,7 @@ Irform.queue = function (item, action) {
 			action.call(item);
 		}
 	}
-	/* Execute the items from the queue */
+	// Execute the items from the queue
 	else {
 		var queue = $(item).data("irform-queue") || [];
 		while (queue.length) {
@@ -521,31 +614,39 @@ Irform.queue = function (item, action) {
  */
 Irform.set = function (selector, values, callback) {
 
-	/* Find direct elements only */
+	// Find direct elements only
 	var list = $(selector).find("[name]").addBack("[name]").not("a").filter(function() {
 		var nearestMatch = $(this).parent().closest("[name]");
 		return nearestMatch.length == 0 || ($(selector).find(nearestMatch).length == 0 && $(selector).filter(nearestMatch).length == 0);
 	});
 
-	/* Set their values */
+	// Set their values
 	$(list).each(function() {
 		var key = $(this).prop("name") || $(this).attr("name");
 		if (typeof values[key] !== "undefined") {
 			var value = values[key];
 			if (typeof callback === "function") {
 				var result = callback.call(this, key, value);
-				/* Update the value or quit the function depending on the result */
+				// Update the value or quit the function depending on the result
 				if (typeof result !== "undefined") {
-					/* If result === null (special value) ignore the value */
+					// If result === null (special value) ignore the value
 					if (result === null) {
 						return;
 					}
 					value = result;
 				}
 			}
-			/* Support pending state */
+			// Support pending state
 			Irform.queue(this, function() {
-				$(this).val(value);
+				if ($(this).hasClass("irform-container")) {
+					Irform.set($(this).children(), value);
+				}
+				else if ($(this).is("input[type=checkbox]")) {
+					$(this).prop("checked", value);
+				}
+				else {
+					$(this).val(value);
+				}
 				$(this).trigger("change");
 			});
 		}
@@ -558,26 +659,31 @@ Irform.set = function (selector, values, callback) {
 Irform.get = function (selector, callback) {
 	var data = {};
 
-	/* Find direct elements only and remove anchors */
+	// Find direct elements only and remove anchors
 	var list = $(selector).find("[name]").addBack("[name]").not("a").filter(function() {
 		var nearestMatch = $(this).parent().closest("[name]");
 		return nearestMatch.length == 0 || ($(selector).find(nearestMatch).length == 0 && $(selector).filter(nearestMatch).length == 0);
 	});
 
-	/* Read their values */
+	// Read their values
 	$(list).each(function() {
-		/* Support the pending attribute */
+		// Support the pending attribute
 		if ($(this).hasClass("irform-pending")) {
 			return;
 		}
 		var key = $(this).prop("name") || $(this).attr("name");
-		/* Set the new value */
+		// Set the new value
 		if (key) {
-			var value = $(this).val();
+			// Support containers and checkboxes
+			var value = ($(this).hasClass("irform-container")) ?
+					Irform.get($(this).children()) :
+					($(this).is("input[type=checkbox]")) ?
+					$(this).is(":checked") : $(this).val();
+			// Call the callback if any
 			if (typeof callback === "function") {
 				var result = callback.call(this, key, value);
 				if (typeof result !== "undefined") {
-					/* If result === null (special value) ignore the value */
+					// If result === null (special value) ignore the value
 					if (result === null) {
 						return;
 					}
@@ -595,7 +701,7 @@ Irform.get = function (selector, callback) {
  * Clear the form. This is a static function.
  */
 Irform.clear = function (selector) {
-	/* Handle the irform array if any */
+	// Handle the irform array if any
 	$(selector).find(".irform-array").trigger("array-empty");
 	$(selector).find("[name]").val("").trigger("change");
 };

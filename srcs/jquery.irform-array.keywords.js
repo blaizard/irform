@@ -107,7 +107,7 @@
 
 /* Add the module to Irform */
 Irform.defaultOptions.fields.keywords = function(name) {
-	var div = document.createElement("div");
-	$(div).irformArrayKeywords({name: name});
+	var div = $("<div>");
+	div.irformArrayKeywords({name: name});
 	return div;
 };

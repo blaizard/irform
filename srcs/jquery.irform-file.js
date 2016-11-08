@@ -75,24 +75,40 @@
 		/* Reference to the main object */
 		var obj = this;
 		/* Create the container */
-		var container = document.createElement("div");
-		$(container).addClass("irform-group");
+		var container = $("<div>", {
+			class: "irform-group"
+		});
 		/* Create the input field */
-		var input = document.createElement("input");
-		$(input).attr("name", options.name);
-		$(input).addClass("irform");
+		var input = $("<input>", {
+			name: options.name,
+			class: "irform"
+		});
 		$(container).append(input);
 		/* Add the button(s) */
 		for (var i in options.buttonList) {
 			var preset = options.presets[options.buttonList[i]];
-			var button = document.createElement("button");
+			var button = $("<button>", {
+				class: "irform",
+				type: "button"
+			});
 			$(button).text(preset.caption);
-			$(button).addClass("irform");
-			$(button).attr("type", "button");
+			$(button).data("irformFile", preset);
 			$(button).click(function() {
-				preset.action.call(obj, function(value) {
+				var callback = function(value) {
 					$(input).val(value);
-				}, preset.options);
+				};
+				var options = $(obj).data("irformFile");
+				var preset = $(this).data("irformFile");
+				// Cleanup the previous action if any
+				if (options.clean) {
+					options.clean.call(obj, callback);
+				}
+				// Save the new clean function if any
+				options.clean = (preset.clean) ? preset.clean : null;
+				$(obj).data("irformFile", options);
+
+				// Call the action
+				preset.action.call(obj, callback, preset.options);
 			});
 			$(container).append(button);
 		}
@@ -109,11 +125,11 @@
 		/**
 		 * The name of the element, this must be set
 		 */
-		name: null,
+		name: "file",
 		/**
 		 * Button types
 		 */
-		buttonList: [],
+		buttonList: ["upload"],
 		/**
 		 * Overwrite the type of file supported, a string supporting regexpr format.
 		 */
@@ -121,14 +137,45 @@
 		/**
 		 * List of presets
 		 */
-		presets: {}
+		presets: {
+			"upload": {
+				caption: "Upload",
+				action: function(callback, presetOptions) {
+					var options = $(this).data("irformFile");
+					var file = $("<input>", {
+						type: "file",
+						class: "irform-file-upload",
+						name: options.name + ((presetOptions.mode == "multi") ? "[]" : ""),
+						multiple: (presetOptions.mode == "multi") ? true : false
+					});
+					$(file).on("change", function() {
+						var name = "";
+						if (typeof this.files === "object") {
+							for (var i = 0; i<this.files.length; i++) {
+								name += ((name) ? " " : "") + "\"" + this.files.item(i).name + "\"";
+							}
+						}
+						callback(name);
+					});
+					$(file).hide();
+					$(this).append(file);
+					$(file).trigger("click");
+				},
+				options: {mode: "multi"}, // or single
+				clean: function(callback) {
+					// Reset the value and destroy the previous upload if any
+					callback("");
+					$(this).find(".irform-file-upload").remove();
+				}
+			}
+		}
 	};
 
 })(jQuery);
 
 /* Add the module to Irform */
 Irform.defaultOptions.fields.file = function(name, options) {
-	var div = document.createElement("div");
+	var div = $("<div>");
 	var o = {name: name};
 	if (typeof options["options"] === "object") {
 		o = $.extend(true, o, options["options"]);

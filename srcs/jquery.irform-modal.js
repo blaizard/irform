@@ -76,16 +76,17 @@
 		// Options of the current irformModal
 		var options = $(this).data("irformModal");
 
-		var modal = document.createElement("div");
-		$(modal).addClass("irform-modal-content");
+		var modal = $("<div>", {
+			class: "irform-modal-content"
+		});
 		$(modal).append(this);
 		$(modal).click(function(e) {
 			e.stopPropagation();
 		});
 
-		var container = document.createElement("div");
-		$(container).addClass("irform-modal");
-		$(container).append(modal);
+		var container = $("<div>", {
+			class: "irform-modal"
+		});
 		$(container).css({
 			top: 0,
 			left: 0,
@@ -94,6 +95,7 @@
 			position: "fixed",
 			zIndex: options.zIndex
 		});
+		$(container).append(modal);
 
 		// Save the container instance
 		options.container = container;

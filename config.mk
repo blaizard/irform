@@ -1,4 +1,5 @@
 BASE_SRCS := \
+	srcs/irrequire.min.js \
 	srcs/irform.js \
 	srcs/jquery.irform-array.js \
 	srcs/jquery.irform-array.keywords.js \
@@ -6,27 +7,42 @@ BASE_SRCS := \
 	srcs/jquery.irform-file.js \
 	srcs/jquery.irform-modal.js \
 	srcs/irform.irexplorer.js
+# Irform ----------------------------------------------------------------------
 
 # irform.min.js
-minify_mainjs: OUTPUT := irform.min.js
-minify_mainjs: SRCS := $(BASE_SRCS)
+process-stamp_mainjs: OUTPUT := js/irform.min.js
+process-stamp_mainjs: INPUT := $(BASE_SRCS)
+
+# Include sources
+concat-stamp_mainjs: OUTPUT := js/irform.js
+concat-stamp_mainjs: INPUT := $(BASE_SRCS)
+
+# Style -----------------------------------------------------------------------
 
 # irform.min.css
-minify_maincss: OUTPUT := irform.min.css
-minify_maincss: SRCS := \
+process-stamp_maincss: OUTPUT := css/irform.min.css
+process-stamp_maincss: INPUT := \
 	theme/default/icon.css \
 	theme/default/irform.css
 
 # theme/default/fonts
-dist_mainfont: SRCS := theme/default/fonts
+copy_mainfont: INPUT := theme/default/fonts
+copy_mainfont: OUTPUT := css
+
+# Bootstrap -------------------------------------------------------------------
 
 # irform.bootstrap.min.js
-minify_bootstrapjs: OUTPUT := irform.bootstrap.min.js
-minify_bootstrapjs: SRCS := $(BASE_SRCS) \
+process-stamp_bootstrapjs: OUTPUT := js/irform.bootstrap.min.js
+process-stamp_bootstrapjs: INPUT := $(BASE_SRCS) \
+	srcs/irform.bootstrap.js
+
+# Include sources
+concat-stamp_bootstrapjs: OUTPUT := js/irform.bootstrap.js
+concat-stamp_bootstrapjs: INPUT := $(BASE_SRCS) \
 	srcs/irform.bootstrap.js
 
 # Stamp text to apply to each files
-STAMP_TXT = $(OUTPUT) (`date +'%Y.%m.%d'`) by Blaise Lengrand
+STAMP_TXT = $(notdir $(OUTPUT)) (`date +'%Y.%m.%d'`) by Blaise Lengrand\n
 
 # Package name
 PACKAGE := irform.zip

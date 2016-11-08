@@ -1,6 +1,10 @@
 <html>
 	<head>
 		<script src="jquery-3.1.0.min.js"></script>
+
+		<script src="irexplorer/irexplorer.min.js"></script>
+
+		<script src="../srcs/irrequire.min.js"></script>
 		<script src="../srcs/irform.js"></script>
 		<script src="../srcs/jquery.irform-array.js"></script>
 		<script src="../srcs/jquery.irform-array.keywords.js"></script>
@@ -21,23 +25,12 @@
 		<script src="../irform.min.js"></script>
 		//-->
 		<script src="tinymce/js/tinymce/tinymce.min.js"></script>
-		<script src="irexplorer/irexplorer.min.js"></script>
 		<script src="ircom/ircom.js"></script>
-
 
 		<script src="tinymce.keyword.plugin.js"></script>
 		<script src="tinymce.inlinecode.plugin.js"></script>
 	</head>
 	<body>
-		<form id="myForm" action="register.php" method="get"></form>
-		<script>
-			var irform = new Irform("#myForm", [
-			    {name: "username", caption: "Username", type: "input", required: true, validate: Irform.EMAIL},
-			    {name: "password", caption: "Password", type: "password", required: true},
-			    {type: "submit", value: "Ok"}
-			]);
-		</script>
-
 		<h1>Static form</h1>
 		<form id="example1">
 			First name:<br>
@@ -72,24 +65,22 @@
 			}
 		</script>
 		<h1>Irform().create(...)</h1>
-
-		<div id="test">Hello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br>ello world<br></div>
-
-		<form id="example2"></form>
+		<form id="example2" action="hello" method="post"></form>
 		<button type="button" onclick="irformGet_example2()">Irform.get</button><br>
 		<button type="button" onclick="irformSet_example2()">Irform.set</button><br>
 		<button type="button" onclick="irform_toggle_enable()">Enable/Disable</button><br>
 		<button type="button" onclick="irformUpdate_example2()">Irform.update</button><br>
 		<script>
-			$("#test").irformModal();
 
 
 			var formDescription = [
 				{name: "array", caption: "Array", type: "array"},
 				{name: "test", caption: "Test", type: "input"},
+				{name: "checkbox", caption: "Checkbox", type: "checkbox", list: ["hello", "yes"], inline: true},
+				{name: "switch", caption: "Switch", type: "switch"},
 				{name: "keywords", caption: "Keywords", disabled: false, type: "keywords"},
 				{name: "file", caption: "File", type: "file"},
-				{name: "car", caption: "Car", type: "select", description: "What car do you drive?", select: {
+				{name: "car", caption: "Car", type: "select", description: "What car do you drive?", list: {
 						none: "None",
 						mercedes: "Mercedes",
 						peugeot: "Peugeot"
@@ -103,7 +94,8 @@
 					}
 				},
 				{name: "about", required: true, caption: "About Me", type: "textarea", validate: Irform.CHAR_A_Z},
-				{name: "editor", required: true, caption: "Editor", type: "htmleditor", options: {css: "bootstrap/css/bootstrap.css", tinymceBase: "tinymce/js/tinymce"}}
+				{name: "editor", required: true, caption: "Editor", type: "htmleditor", options: {css: "bootstrap/css/bootstrap.css", tinymceBase: "tinymce/js/tinymce"}},
+				{name: "submit", type: "submit"},
 			];
 			var form = new Irform("#example2", formDescription);
 			function irformUpdate_example2() 
@@ -135,7 +127,11 @@
 			{
 				form.set({
 					keyword: "hello, world",
-					editor: "<b>hello</b> <i>world</i>!!!!"
+					editor: "<b>hello</b> <i>world</i>!!!!",
+					switch: true,
+					checkbox: {
+						checkbox: true
+					}
 				});
 			}
 		</script>

@@ -10,7 +10,7 @@ This library can also be easily adapted to support any UI. Bootstrap is currentl
 
 * Lightweight
 * Extensible
-* Non-intrusive[¹](#non-intrusive)
+* Non-intrusive [(1)](#non-intrusive)
 
 ## &#10003; Try the [examples](https://www.blaizard.com/projects/irform/examples)
 
@@ -18,4 +18,4 @@ This library can also be easily adapted to support any UI. Bootstrap is currentl
 
 ## &#10003; Read the [documentation](https://www.blaizard.com/projects/irform/documentation)
 
-<a name="non-intrusive">¹</a> Can be used with an existing form without modification.
+<a name="non-intrusive">(1)</a> Can be used with an existing form without modification.
