@@ -128,7 +128,6 @@ Irform.defaultOptions = {
 			var input = $("<input>", {
 				type: "checkbox",
 				name: name,
-				class: "irform",
 				id: "irform-switch-" + (++Irform.unique)
 			});
 			$(container).append(input);
