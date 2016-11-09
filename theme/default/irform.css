@@ -168,6 +168,7 @@ input.irform[type=checkbox] + label {
 	padding-left: 30px;
 	cursor: pointer;
 	display: inline-block;
+	line-height: 32px;
 }
 input.irform[type=checkbox] + label:before {
 	margin: 5px 0;
