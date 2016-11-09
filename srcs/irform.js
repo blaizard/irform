@@ -170,7 +170,8 @@ Irform.defaultOptions = {
 					var form = $("<form>", {
 						action: $(obj.container).prop("action"),
 						method: $(obj.container).prop("method") || "POST",
-						enctype: "multipart/form-data"
+						enctype: "multipart/form-data",
+						style: "display: none;"
 					});
 					// Re-create the data
 					var createDataRec = function(values, prefix) {
@@ -196,6 +197,8 @@ Irform.defaultOptions = {
 					$(obj.container).find("input[type=file]").each(function() {
 						$(this).appendTo(form);
 					});
+					// Need to append to the DOM the form before submitting it (at least for IE & FF)
+					$("body").append(form);
 					form.submit();
 				}
 			});
