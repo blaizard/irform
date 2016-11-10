@@ -51,8 +51,8 @@ WGET_CMD ?= wget
 PRINT_FLAGS ?=
 MINIFY_JS_FLAGS ?= --compress --mangle -v --lint
 MINIFY_CSS_FLAGS ?=
-SASS_FLAGS ?= --sourcemap=none --unix-newlines
-SCSS_FLAGS ?= --sourcemap=none --unix-newlines --scss
+SASS_FLAGS ?= --sourcemap=none --unix-newlines --no-cache
+SCSS_FLAGS ?= --sourcemap=none --unix-newlines --no-cache --scss
 CONCAT_FLAGS ?=
 MKDIR_FLAGS ?= -p
 RMDIR_FLAGS ?= -rfd
