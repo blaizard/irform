@@ -23,7 +23,7 @@ concat-stamp_mainjs: INPUT := $(BASE_SRCS)
 process-stamp_maincss: OUTPUT := css/irform.min.css
 process-stamp_maincss: INPUT := \
 	theme/default/icon.css \
-	theme/default/irform.css
+	theme/default/main.scss
 
 # theme/default/fonts
 copy_mainfont: INPUT := theme/default/fonts

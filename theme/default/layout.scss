@@ -1,0 +1,33 @@
+.irform-item {
+	margin: 10px 0px;
+}
+
+.irform-caption {
+	text-align: right;
+	width: 150px;
+	white-space: normal;
+	flex-shrink: 0;
+	font-weight: bold;
+}
+
+.irform-elements {
+	padding-left: 10px;
+	width: 100%;
+}
+
+@media screen and (max-width: 768px) {
+	.irform-item {
+		flex-flow: column nowrap;
+		margin: 5px 0px;
+	}
+
+	.irform-caption {
+		text-align: left;
+		width: 100%;
+		margin-bottom: 5px;
+	}
+
+	.irform-elements {
+		padding-left: 0;
+	}
+}

@@ -1,0 +1,56 @@
+input.irform[type=checkbox] {
+	position: absolute;
+	top: -99999px;
+	left: -99999px;
+	+ label {
+		position: relative;
+		padding-left: 30px;
+		cursor: pointer;
+		@extend %single-line;
+		@extend %inline;
+		&:before {
+			margin: 5px 0;
+			content: '';
+			background-color: #fff;
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 22px;
+			height: 22px;
+			@extend %clickable;
+			@extend %border;
+			&:hover {
+				@extend %hover;
+			}
+		}
+	}
+	&:checked + label:after {
+		content: "\2713";
+		font-size: 18px;
+		font-weight: bold;
+		line-height: 32px;
+		color: #000;
+		position: absolute;
+		top: 0;
+		left: 4px;
+	}
+	&:focus + label:before {
+		@extend %focus;
+	}
+}
+.irform-inline input.irform[type=checkbox] + label {
+	min-width: 48px;
+	margin-right: 16px;
+	@extend %inline;
+}
+
+// Disable
+.disable input.irform[type=checkbox] + label,
+input.input.irform[type=checkbox] + label.disabled,
+input.input.irform[type=checkbox] + label.disable {
+	@extend %disable-text;
+	&:before {
+		@extend %disable;
+	}
+}
+

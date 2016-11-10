@@ -1,0 +1,38 @@
+.irform-array-item {
+	@extend %group;
+}
+.irform-array-item:not(.inline) {
+	margin-bottom: 5px;
+}
+
+.irform-array-add {
+	@extend %inline;
+}
+.irform-array-item-content {
+	width: 100%;
+	flex-shrink: 1;
+	order: 1;
+	margin-right: 5px;
+}
+.irform-array-item:hover {
+	.irform-array-item-up,
+	.irform-array-item-down,
+	.irform-array-item-del {
+		display: inline-block;
+	}
+}
+.irform-array-item-up,
+.irform-array-item-down,
+.irform-array-item-del {
+	display: none;
+	flex-shrink: 0;
+}
+.irform-array-item-up {
+	order: 2;
+}
+.irform-array-item-down {
+	order: 3;
+}
+.irform-array-item-del {
+	order: 4;
+}

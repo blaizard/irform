@@ -1,0 +1,56 @@
+.irform-switch {
+	position: relative;
+	width: 48px;
+	height: 26px;
+	margin: 3px 0;
+	background-color: transparent;
+	input[type=checkbox] {
+		position: absolute;
+		top: -99999px;
+		left: -99999px;
+	}
+	label:before,
+	label:after {
+		display: block;
+		position: absolute;
+		top: 1px;
+		left: 1px;
+		bottom:	1px;
+		content: "";
+		cursor: pointer;
+	}
+	label:before {
+		right: 1px;
+		background-color: $disableBgColor;
+		border-radius: 24px;
+		transition: background 0.4s;
+		@extend %border;
+	}
+	label:after {
+		width: 24px;
+		height: 24px;
+		border-radius: 24px;
+		background-color: $specialBgColor;
+		transition: margin 0.4s;
+		box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+		@extend %border;
+		@extend %clickable;
+	}
+	input[type=checkbox]:checked + label:before {
+		background-color: $fieldBgColor;
+	}
+	input[type=checkbox]:checked + label:after {
+		margin-left: 23px;
+	}
+	input[type=checkbox]:focus + label:before {
+		@extend %focus;
+	}
+}
+
+.disable .irform.irform-switch {
+	background-color: transparent;
+}
+.disable .irform-switch label:before,
+.disable .irform-switch label:after {
+	@extend %disable;
+}

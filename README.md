@@ -6,6 +6,8 @@ All the basic fields are already supported (input, textarea, select...), more ad
 
 This library can also be easily adapted to support any UI. Bootstrap is currently supported but any other can be easily implemented.
 
+&#128279; https://www.blaizard.com/projects/Makefile
+
 ## Features
 
 * Lightweight

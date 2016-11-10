@@ -1,0 +1,31 @@
+input.irform {
+	@extend %single-line;
+	@extend %border;
+	&:hover {
+		@extend %hover;
+	}
+	&:focus {
+		@extend %focus;
+	}
+}
+
+// Error
+.error input.irform,
+input.irform.error {
+	@extend %error;
+	@extend %error-border;
+}
+
+// Success
+.success input.irform,
+input.irform.success {
+	@extend %success;
+	@extend %success-border;
+}
+
+// Disable
+.disable input.irform,
+input.irform:disabled,
+input.irform.disable {
+	@extend %disable;
+}

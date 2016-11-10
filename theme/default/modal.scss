@@ -1,0 +1,16 @@
+.irform-modal {
+	background-color: rgba(0, 0, 0, 0.5);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.irform-modal-content {
+	padding: 30px 30px;
+	background-color: #fff;
+	max-height: 80%;
+	max-width: 80%;
+	min-height: 200px;
+	min-width: 400px;
+	overflow: auto;
+	border-radius: 5px;
+}

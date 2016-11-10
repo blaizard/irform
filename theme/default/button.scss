@@ -1,0 +1,33 @@
+button.irform {
+	@extend %single-line;
+	@extend %border;
+	@extend %clickable;
+	@extend %inline;
+	&:hover {
+		@extend %hover;
+		background-color: #fff;
+	}
+	&:focus {
+		@extend %focus;
+	}
+	&:active {
+		background-color: #ccc;
+	}
+	background-color: $specialBgColor;
+	color: $specialTextColor;
+	text-align: center;
+	min-width: 32px;
+	padding: 0 8px;
+}
+
+// Disable
+.disable button.irform,
+button.irform:disabled,
+button.irform.disable {
+	@extend %disable;
+}
+
+// Make sure the button do not shrink in groups
+.irform-group button {
+	flex-shrink: 0;
+}
