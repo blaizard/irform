@@ -8,6 +8,7 @@
 	white-space: normal;
 	flex-shrink: 0;
 	font-weight: bold;
+	@extend %multi-line;
 }
 
 .irform-elements {
