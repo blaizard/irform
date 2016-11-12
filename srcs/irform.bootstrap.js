@@ -26,6 +26,9 @@ Irform.defaultOptions.wrapper = function(elt, options, name) {
 	if ($(elt).is("input,textarea,select")) {
 		$(elt).addClass("form-control");
 	}
+	if ($(elt).is("button")) {
+		$(elt).addClass("btn btn-default");
+	}
 	$(col).append(elt);
 	if (typeof options.description !== "undefined") {
 		var description = $("<small>", {
@@ -76,8 +79,36 @@ Irform.defaultOptions.disable = function(isDisabled, elt) {
 
 /* Update the plugins */
 (function($) {
-	$.fn.irformArray.defaults.template = "<input type=\"text\" class=\"form-control\" />";
+	$.fn.irformArray.defaults.template = "<input type=\"text\" name=\"text\" class=\"form-control\" />";
 	$.fn.irformArray.defaults.add = "<button type=\"button\" class=\"btn btn-info\"><span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> Add</button>";	
+	$.fn.irformArray.defaults.delete = "<button type=\"button\" class=\"btn btn-default \"><span class=\"glyphicon glyphicon-remove\" aria-hidden=\"true\"></span>&nbsp;</button>";	
+	$.fn.irformArray.defaults.up = "<button type=\"button\" class=\"btn btn-default \"><span class=\"glyphicon glyphicon-arrow-up\" aria-hidden=\"true\"></span>&nbsp;</button>";	
+	$.fn.irformArray.defaults.down = "<button type=\"button\" class=\"btn btn-default \"><span class=\"glyphicon glyphicon-arrow-down\" aria-hidden=\"true\"></span>&nbsp;</button>";	
+	$.fn.irformArray.defaults.hookAdd = function(item) {
+		$(item).css({
+			display: "flex",
+			flexFlow: "row nowrap",
+			marginBottom: "5px"
+		});
+		$(item).find(".irform-array-item-content").css({
+			width: "100%",
+			flexShrink: 1,
+			order: 1,
+			marginRight: "5px"
+		});
+		$(item).find(".irform-array-item-up").css({
+			flexShrink: 0,
+			order: 2
+		});
+		$(item).find(".irform-array-item-down").css({
+			flexShrink: 0,
+			order: 3
+		});
+		$(item).find(".irform-array-item-del").css({
+			flexShrink: 0,
+			order: 4
+		});
+	};
 	$.fn.irformArrayKeywords.defaults.template = "<span style=\"margin-right: 10px;\">" +
 						"<span class=\"irform-array-keywords-edit\">" +
 							"<span class=\"irform-array-item-left glyphicon glyphicon-triangle-left\" aria-hidden=\"true\"></span>" +

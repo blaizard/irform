@@ -35,14 +35,14 @@
 			var tag = $(item).find(".irform-array-keywords-tag");
 			$(item).find("input").on("blur", function() {
 				var value = $(this).val();
-				/* If the value is empty, then delete the item */
+				// If the value is empty, then delete the item
 				if (!value) {
-					$(obj).irformArray("itemDelete", item);
+					$().irformArray.deleteItem.call(obj, item);
 				}
-				/* Else hide the input and show the tag */
+				// Else hide the input and show the tag
 				else {
 					$(edit).hide();
-					/* Show and update the tag */
+					// Show and update the tag
 					$(tag).find("span:first").text(value);
 					$(tag).show();
 				}
@@ -51,29 +51,29 @@
 			});
 
 			$(tag).click(function() {
-				/* Do nothing if this element is disabled */
+				// Do nothing if this element is disabled
 				if ($(obj).prop("disabled") === true) {
 					return;
 				}
-				/* Once a new element is added, make sure all the others are in non-edit mode */
+				// Once a new element is added, make sure all the others are in non-edit mode
 				$(obj).find(".irform-array-item").not(item).find("input").trigger("blur");
 				$(this).hide();
-				/* Show and update the tag */
+				// Show and update the tag
 				$(edit).show();
 			});
 
-			/* Allocate the various events */
+			// Allocate the various events
 			$(item).find(".irform-array-item-left").click(function() {
-				$(obj).irformArray("itemUp", item);
+				$().irformArray.moveItemUp.call(obj, item);
 			});
 			$(item).find(".irform-array-item-right").click(function() {
-				$(obj).irformArray("itemDown", item);
+				$().irformArray.moveItemDown.call(obj, item);
 			});
 			$(item).find(".irform-array-item-del").click(function() {
-				$(obj).irformArray("itemDelete", item);
+				$().irformArray.deleteItem.call(obj, item);
 			});
 
-			/* Once a new element is added, make sure all the others are in non-edit mode */
+			// Once a new element is added, make sure all the others are in non-edit mode
 			$(this).find(".irform-array-item").not(item).find("input").trigger("blur");
 		},
 		/**
@@ -83,7 +83,7 @@
 			value = value.split(",");
 			var newVal = [];
 			for (var i in value) {
-				/* Clean the value */
+				// Clean the value
 				var v = value[i].trim();
 				if (v) {
 					newVal.push({

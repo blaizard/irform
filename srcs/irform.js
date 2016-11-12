@@ -80,8 +80,6 @@ Irform.defaultOptions = {
 		},
 		/**
 		 * \brief Create one or multiple checkbox field(s).
-		 *
-		 * options.list
 		 */
 		checkbox: function(name, options) {
 			var createCheckbox = function(name, label, inline) {
@@ -120,7 +118,6 @@ Irform.defaultOptions = {
 
 			return container;
 		},
-		/*radio: fun*/
 		switch: function(name/*, options*/) {
 			var container = $("<div>", {
 				class: "irform irform-switch"
@@ -158,48 +155,7 @@ Irform.defaultOptions = {
 			$(button).text(options.value || "Submit");	
 			var obj = this;
 			$(button).click(function() {
-				var values = obj.get();
-				if (values === false) {
-					return;
-				}
-				if (typeof options.callback === "function") {
-					options.callback.call(obj, values);
-				}
-				else if (obj.container.is("form")) {
-					var form = $("<form>", {
-						action: $(obj.container).prop("action"),
-						method: $(obj.container).prop("method") || "POST",
-						enctype: "multipart/form-data",
-						style: "display: none;"
-					});
-					// Re-create the data
-					var createDataRec = function(values, prefix) {
-						var data = "";
-						for (var name in values) {
-							if (typeof values[name] === "object") {
-								data += createDataRec(values[name],
-										((prefix) ? prefix + "[" + name + "]" : name));
-								// Cannot send an emty array via post, then if the array is empty, simply do not send it
-							}
-							else {
-								data += "<input name=\""
-										+ ((prefix) ? prefix + "[" + name + "]" : name)
-										+ "\" value=\"" + (values[name] + "").replace(/"/g, '&quot;') + "\"/>";
-								// POST converts all types to string, so no need to make special cases
-							}
-						}
-						return data;
-					};
-					var data = createDataRec(values, "");
-					$(form).html(data);
-					// Note: file upload works only with POST and enctype="multipart/form-data"
-					$(obj.container).find("input[type=file]").each(function() {
-						$(this).appendTo(form);
-					});
-					// Need to append to the DOM the form before submitting it (at least for IE & FF)
-					$("body").append(form);
-					form.submit();
-				}
+				obj.submit(options.callback);
 			});
 			return button;
 		},
@@ -335,6 +291,57 @@ Irform.findNameHolder = function (elt, name) {
 		name = ($(elt).hasClass("irform-item")) ? $(elt).attr("data-irform") : null;
 	}
 	return $(elt).find("[name" + ((name) ? ("=" + name) : "") + "]").addBack("[name" + ((name) ? ("=" + name) : "") + "]").first();
+}
+
+/**
+ * Submit the form
+ */
+Irform.prototype.submit = function (callback) {
+	// Read teh values, and make sure everything is validated
+	var values = this.get();
+	if (values === false) {
+		return;
+	}
+	// If a callback is passsed into argument, simply call it
+	if (typeof callback === "function") {
+		callback.call(this, values);
+	}
+	// If this is part of a form, submit the form
+	else if (this.container.is("form")) {
+		var form = $("<form>", {
+			action: $(this.container).prop("action"),
+			method: $(this.container).prop("method") || "POST",
+			enctype: "multipart/form-data",
+			style: "display: none;"
+		});
+		// Re-create the data
+		var createDataRec = function(values, prefix) {
+			var data = "";
+			for (var name in values) {
+				if (typeof values[name] === "object") {
+					data += createDataRec(values[name],
+							((prefix) ? prefix + "[" + name + "]" : name));
+					// Cannot send an emty array via post, then if the array is empty, simply do not send it
+				}
+				else {
+					data += "<input name=\""
+							+ ((prefix) ? prefix + "[" + name + "]" : name)
+							+ "\" value=\"" + (values[name] + "").replace(/"/g, '&quot;') + "\"/>";
+					// POST converts all types to string, so no need to make special cases
+				}
+			}
+			return data;
+		};
+		var data = createDataRec(values, "");
+		$(form).html(data);
+		// Note: file upload works only with POST and enctype="multipart/form-data"
+		$(this.container).find("input[type=file]").each(function() {
+			$(this).appendTo(form);
+		});
+		// Need to append to the DOM the form before submitting it (at least for IE & FF)
+		$("body").append(form);
+		form.submit();
+	}
 }
 
 /**

@@ -18,13 +18,13 @@
 	 * \return {jQuery}
 	 */
 	$.fn.irformArray = function(arg, data) {
-		/* This is the returned value */
+		// This is the returned value
 		var retval;
-		/* Go through each objects */
+		// Go through each objects
 		$(this).each(function() {
 			retval = $().irformArray.x.call(this, arg, data);
 		});
-		/* Make it chainable, or return the value if any  */
+		// Make it chainable, or return the value if any
 		return (typeof retval === "undefined") ? $(this) : retval;
 	};
 
@@ -33,47 +33,34 @@
 	 * \private
 	 */
 	$.fn.irformArray.x = function(arg, data) {
-		/* Load the default options */
+		// Load the default options
 		var options = $.fn.irformArray.defaults;
 
-		/* --- Deal with the actions / options --- */
-		/* Set the default action */
+		// --- Deal with the actions / options ---
+		// Set the default action
 		var action = "create";
-		/* Deal with the action argument if it has been set */
+		// Deal with the action argument if it has been set
 		if (typeof arg === "string") {
 			action = arg;
 		}
-		/* If the module is already created and the action is not create, load its options */
+		// If the module is already created and the action is not create, load its options
 		if (action != "create" && $(this).data("irformArray")) {
 			options = $(this).data("irformArray");
 		}
-		/* If the first argument is an object, this means options have
-		 * been passed to the function. Merge them recursively with the
-		 * default options.
-		 */
+		// If the first argument is an object, this means options have
+		// been passed to the function. Merge them recursively with the
+		// default options.
 		if (typeof arg === "object") {
 			options = $.extend(true, {}, options, arg);
 		}
-		/* Store the options to the module */
+		// Store the options to the module
 		$(this).data("irformArray", options);
 
-		/* Handle the different actions */
+		// Handle the different actions
 		switch (action) {
-		/* Create action */
+		// Create action
 		case "create":
 			$.fn.irformArray.create.call(this);
-			break;
-		/* Delete the item passed in argument */
-		case "itemDelete":
-			$.fn.irformArray.deleteItem.call(this, data);
-			break;
-		/* Move up the item passed in argument */
-		case "itemUp":
-			$.fn.irformArray.moveItemUp.call(this, data);
-			break;
-		/* Move down the item passed in argument */
-		case "itemDown":
-			$.fn.irformArray.moveItemDown.call(this, data);
 			break;
 		};
 	};
@@ -82,7 +69,7 @@
 	 * Delete an item from the array
 	 */
 	$.fn.irformArray.deleteItem = function(item) {
-		/* Do nothing if this element is disabled */
+		// Do nothing if this element is disabled
 		if ($(this).prop("disabled") === true) {
 			return;
 		}
@@ -93,7 +80,7 @@
 	 * Move Up/Previous an item from the array
 	 */
 	$.fn.irformArray.moveItemUp = function(item) {
-		/* Do nothing if this element is disabled */
+		// Do nothing if this element is disabled
 		if ($(this).prop("disabled") === true) {
 			return;
 		}
@@ -108,7 +95,7 @@
 	 * Move Down/Next an item from the array
 	 */
 	$.fn.irformArray.moveItemDown = function(item) {
-		/* Do nothing if this element is disabled */
+		// Do nothing if this element is disabled
 		if ($(this).prop("disabled") === true) {
 			return;
 		}
@@ -123,9 +110,9 @@
 	 * Add a new item
 	 */
 	$.fn.irformArray.add = function() {
-		/* The instanc eof the current object */
+		// The instanc eof the current object
 		var obj = this;
-		/* Read the options */
+		// Read the options
 		var options = $(this).data("irformArray");
 
 		var template = options.template;
@@ -137,7 +124,7 @@
 			$(item).css("display", "inline-block");
 		}
 
-		/* Delete button */
+		// Delete button
 		if (options.isDelete) {
 			var del = $("<div>", {
 				class: "irform-array-item-del"
@@ -149,9 +136,9 @@
 			$(item).append(del);
 		}
 
-		/* Move (Up/Down) button */
+		// Move (Up/Down) button
 		if (options.isMove) {
-			/* Button Up */
+			// Button Up
 			var up = $("<div>", {
 				class: "irform-array-item-up"
 			});
@@ -160,7 +147,7 @@
 				$.fn.irformArray.moveItemUp.call(obj, item);
 			});
 			$(item).append(up);
-			/* Button Down */
+			// Button Down
 			var down = $("<div>", {
 				class: "irform-array-item-down"
 			});
@@ -184,7 +171,7 @@
 
 		$(this).find(".irform-array-content:first").append(item);
 
-		/* Trigger the hook */
+		// Trigger the hook
 		options.hookAdd.call(obj, item);
 	}
 
@@ -197,42 +184,42 @@
 
 	$.fn.irformArray.create = function() {
 
-		/* The instanc eof the current object */
+		// The instanc eof the current object
 		var obj = this;
-		/* Read the options */
+		// Read the options
 		var options = $(this).data("irformArray");
 
-		/* Container of the array */
+		// Container of the array
 		$(obj).empty();
 		$(obj).addClass("irform-array");
 		$(obj).attr("name", options.name);
 
-		/* Create the content array */
+		// Create the content array
 		var content = $("<div>", {
 			class: "irform-array-content",
 			style: (options.inline) ? "display:inline-block;" : ""
 		});
 		$(obj).append(content);
 
-		/* Set an event to add new items */
+		// Set an event to add new items
 		$(obj).on("array-add", function() {
 			$.fn.irformArray.add.call(obj);
 		});
 
-		/* Set an event to clear all items */
+		// Set an event to clear all items
 		$(obj).on("array-empty", function() {
 			$.fn.irformArray.clear.call(obj);
 		});
 
-		/* Set the add button */
+		// Set the add button
 		if (options.isAdd) {
 			var add = $("<div>", {
 				class: "irform-array-add",
-				style: (options.inline) ? "display:inline-block;" : ""
+				style: "display:inline-block;"
 			});
 			$(add).html(options.add);
 			$(add).click(function() {
-				/* Do nothing if this element is disabled */
+				// Do nothing if this element is disabled
 				if ($(obj).prop("disabled") === true) {
 					return;
 				}
@@ -308,10 +295,10 @@
 		}
 	};
 
-	/* Override the val function to handle this element */
+	// Override the val function to handle this element
 	var originalVal = $.fn.val;
 	$.fn.val = function(value) {
-		/* Read */
+		// Read
 		if (!arguments.length) {
 			if ($(this).hasClass("irform-array")) {
 				var value = [];
@@ -321,18 +308,18 @@
 				var options = $(this).data("irformArray");
 				return options.hookValRead.call(this, value);
 			}
-			/* Callback the original function */
+			// Callback the original function
 			return originalVal.apply(this, arguments);
 		}
-		/* Write */
-		/* Make this variable local to pas it through the each function, seems to work only this way */
+		// Write
+		// Make this variable local to pas it through the each function, seems to work only this way
 		var v = value;
 		$(this).each(function() {
-			/* Hack to make the variable visiable in this scope */
+			// Hack to make the variable visiable in this scope
 			var value = v;
 			if ($(this).hasClass("irform-array")) {
 				var options = $(this).data("irformArray");
-				/* Callback used to update the value if needed */
+				// Callback used to update the value if needed
 				value = options.hookValWrite.call(this, value);
 				$(this).trigger("array-empty");
 				for (var i in value) {
@@ -342,7 +329,7 @@
 				}
 			}
 			else {
-				/* Callback the original function */
+				// Callback the original function
 				originalVal.call($(this), value);
 			}
 		});
@@ -350,7 +337,7 @@
 	};
 })(jQuery);
 
-/* Add the module to Irform */
+// Add the module to Irform
 Irform.defaultOptions.fields.array = function(name, options) {
 	var div = $("<div>");
 	$(div).irformArray({
