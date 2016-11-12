@@ -46,11 +46,16 @@ input.irform[type=checkbox] {
 
 // Disable
 .disable input.irform[type=checkbox] + label,
-input.input.irform[type=checkbox] + label.disabled,
-input.input.irform[type=checkbox] + label.disable {
+input.irform[type=checkbox] + label.disabled,
+input.irform[type=checkbox] + label.disable {
 	@extend %disable-text;
 	&:before {
 		@extend %disable;
 	}
 }
 
+// Error specific
+.error input.irform[type=checkbox] + label:before,
+input.irform[type=checkbox].error + label:before {
+	@extend %error-border;
+}

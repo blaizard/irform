@@ -32,7 +32,7 @@
 	 * This function handles a single object.
 	 * \private
 	 */
-	$.fn.irformArray.x = function(arg, data) {
+	$.fn.irformArray.x = function(arg/*, data*/) {
 		// Load the default options
 		var options = $.fn.irformArray.defaults;
 

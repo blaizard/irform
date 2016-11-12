@@ -234,8 +234,8 @@ Irform.defaultOptions = {
 	 * Called once an item needs to be disabled
 	 */
 	disable: function(isDisabled, elt) {
-		var item = Irform.findNameHolder(elt);
-		$(item).find("input,textarea,select,button").add(item).prop("disabled", isDisabled);
+		var nameHolder = Irform.findNameHolder(elt);
+		$(nameHolder).find("input,textarea,select,button").add(nameHolder).prop("disabled", isDisabled);
 		$(elt).find("input,textarea,select,button").filter(".irform").prop("disabled", isDisabled);
 		if (isDisabled) {
 			$(elt).addClass("disable");
@@ -243,8 +243,8 @@ Irform.defaultOptions = {
 		else {
 			$(elt).removeClass("disable");
 		}
-		Irform.queue(item, function() {
-			$(item).trigger((isDisabled) ? "disable" : "enable");
+		Irform.queue(nameHolder, function() {
+			$(nameHolder).trigger((isDisabled) ? "disable" : "enable");
 		});
 	},
 	/**
@@ -333,14 +333,14 @@ Irform.prototype.create = function (container, formDescription) {
 		});
 		var nameHolder = Irform.findNameHolder(containerItem, itemName);
 		// Define the on-change function
-		$(nameHolder).on("change", function(e) {
-			var name = $(this).prop("name");
+		$(nameHolder).on("change", function() {
+			var name = $(this).prop("name") || $(this).attr("name");
 			var value = Irform.get(this)[name];
 			var item = $(this).parents(".irform-item:first");
 			var itemOptions = $(item).data("irform");
 
 			// If there is a validate condition
-			if (value && itemOptions.validate) {
+			if (!Irform.isEmpty(value) && itemOptions.validate) {
 				if (obj.validate(item, value)) {
 					obj.options.callbackSuccess.call(obj, item, name);
 				}
@@ -349,7 +349,7 @@ Irform.prototype.create = function (container, formDescription) {
 				}
 			}
 			// Validate also if the item is required and the value is non-empty
-			else if (value && $(item).hasClass("required")) {
+			else if (!Irform.isEmpty(value) && $(item).hasClass("required")) {
 				obj.options.callbackSuccess.call(obj, item, name);
 			}
 			// Support the onchange callback
@@ -434,15 +434,15 @@ Irform.prototype.submit = function (callback) {
 			var data = "";
 			for (var name in values) {
 				if (typeof values[name] === "object") {
+					// Cannot send an emty array via post, then if the array is empty, simply do not send it
 					data += createDataRec(values[name],
 							((prefix) ? prefix + "[" + name + "]" : name));
-					// Cannot send an emty array via post, then if the array is empty, simply do not send it
 				}
 				else {
+					// POST converts all types to string, so no need to make special cases
 					data += "<input name=\""
 							+ ((prefix) ? prefix + "[" + name + "]" : name)
 							+ "\" value=\"" + (values[name] + "").replace(/"/g, '&quot;') + "\"/>";
-					// POST converts all types to string, so no need to make special cases
 				}
 			}
 			return data;
@@ -504,7 +504,7 @@ Irform.prototype.ignore = function (item, isIgnore) {
  */
 Irform.prototype.validate = function (item, value) {
 	var data = $(item).data("irform");
-	/* Called the function to test the validation */
+	// Called the function to test the validation
 	if (typeof data.validate === "number") {
 		return Irform.validate(data.validate, value);
 	}
@@ -515,7 +515,7 @@ Irform.prototype.validate = function (item, value) {
 	else if (typeof data.validate === "function") {
 		return data.validate.call(this, value, item);
 	}
-	/* By default the validation passed */
+	// By default the validation passed
 	return true;
 };
 
@@ -538,11 +538,11 @@ Irform.prototype.get = function (callback, force) {
 	var isError = false;
 	var errorList = [];
 	var obj = this;
-	/* This option will force the reading of values */
+	// This option will force the reading of values
 	if (typeof force === "undefined") {
 		force = false;
 	}
-	/* Generate the selection */
+	// Generate the selection
 	var selector = $();
 	this.each(function(item) {
 		selector = selector.add($("[name=" + $(item).attr("data-irform") + "]"));
@@ -553,21 +553,21 @@ Irform.prototype.get = function (callback, force) {
 		if (force) {
 			return;
 		}
-		/* If this attribute needs to be ignored */
+		// If this attribute needs to be ignored
 		if (data.ignore) {
 			return null;
 		}
-		/* If this is a required element with an empty value */
-		if (!value && data.required) {
+		// If this is a required element with an empty value
+		if (Irform.isEmpty(value) && item.hasClass("required")) {
 			errorList.push({type: "required", item: item, name: key, options: data});
 			isError = true;
 		}
-		/* If this element needs to be validated */
+		// If this element needs to be validated
 		if (data.validate && !obj.validate(item, value)) {
 			errorList.push({type: "validation", item: item, name: key, options: data});
 			isError = true;
 		}
-		/* If there is a callback */
+		// If there is a callback
 		if (typeof callback === "function") {
 			var result = callback.call(obj, item, key, value);
 			if (typeof result !== "undefined") {
@@ -721,4 +721,19 @@ Irform.clear = function (selector) {
 	// Handle the irform array if any
 	$(selector).find(".irform-array").trigger("array-empty");
 	$(selector).find("[name]").val("").trigger("change");
+};
+
+/**
+ * Check if a value is empty.
+ * Objects or arrays are considered empty of all their members evaluates to empty.
+ */
+Irform.isEmpty = function (value) {
+	if (typeof value == "object") {
+		var empty = true;
+		for (var i in value) {
+			empty &= Irform.isEmpty(value[i]);
+		}
+		return empty;
+	}
+	return (value) ? false : true;
 };

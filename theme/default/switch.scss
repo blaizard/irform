@@ -47,10 +47,17 @@
 	}
 }
 
-.disable .irform.irform-switch {
+// Disable specific
+.disable .irform-switch {
 	background-color: transparent;
 }
 .disable .irform-switch label:before,
 .disable .irform-switch label:after {
 	@extend %disable;
+}
+
+// Error specific
+.error .irform-switch label:before,
+.irform-switch.error label:before {
+	@extend %error-border;
 }
