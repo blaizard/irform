@@ -22,6 +22,8 @@ var Irform = function (container, formDescription, options) {
 	this.options = $.extend(true, {}, Irform.defaultOptions, options);
 	// Empty the container first
 	this.container.empty();
+	// Set the class
+	$(this.container).addClass("irform-layout");
 	// Call the hook
 	this.options.hookInit.call(this);
 	// Create the form
@@ -294,6 +296,119 @@ Irform.findNameHolder = function (elt, name) {
 }
 
 /**
+ * Creates a form
+ */
+Irform.prototype.create = function (container, formDescription) {
+	// To generate unique Ids
+	if (typeof Irform.unique === "undefined") {
+		Irform.unique = 0;
+	}
+	for (var i in formDescription) {
+		// Save as local to pass it through callbacks
+		var obj = this;
+		var itemOptions = $.extend({
+			name: "irform" + (++Irform.unique),
+			type: this.options.defaultType,
+			required: false,
+			validate: null,
+			disabled: false,
+			// By default set item with a name set automatically as ignored
+			ignore: (typeof formDescription[i].name === "undefined") ? true : false,
+			options: {}
+		}, formDescription[i]);
+		// Read the name
+		var itemName = itemOptions.name;
+		// Assign everything back, this must be done due to the automatically generated name
+		formDescription[i] = itemOptions;
+		// Generate the element
+		var type = itemOptions["type"];
+		if (typeof this.options.fields[type] !== "function") {
+			console.log("'" + type + "' is not supported");
+			continue;
+		}
+		var containerItem = this.options.fields[type].call(this, itemName, itemOptions, function() {
+			// Remove the pending tag and execute all the pending items in the queue
+			$(this).removeClass("irform-pending");
+			Irform.queue(this);
+		});
+		var nameHolder = Irform.findNameHolder(containerItem, itemName);
+		// Define the on-change function
+		$(nameHolder).on("change", function(e) {
+			var name = $(this).prop("name");
+			var value = Irform.get(this)[name];
+			var item = $(this).parents(".irform-item:first");
+			var itemOptions = $(item).data("irform");
+
+			// If there is a validate condition
+			if (value && itemOptions.validate) {
+				if (obj.validate(item, value)) {
+					obj.options.callbackSuccess.call(obj, item, name);
+				}
+				else {
+					obj.options.callbackError.call(obj, [{type: "validation", item: item, name: name, options: itemOptions}]);
+				}
+			}
+			// Validate also if the item is required and the value is non-empty
+			else if (value && $(item).hasClass("required")) {
+				obj.options.callbackSuccess.call(obj, item, name);
+			}
+			// Support the onchange callback
+			if (typeof itemOptions.onchange == "function") {
+				itemOptions.onchange.call(obj, item, value);
+			}
+			else if (typeof itemOptions.onchange == "object") {
+				// Delete all the sub entry from this
+				if ($(this).data("nextElement")) {
+					$(item).nextUntil($(this).data("nextElement")).remove();
+				}
+				// Save the value of the next element
+				$(this).data("nextElement", $(item).next());
+				// Then add a new element
+				if (typeof itemOptions.onchange[value] === "object") {
+					obj.create(item, itemOptions.onchange[value]);
+				}
+				else if (typeof itemOptions.onchange["__default__"] === "object") {
+					obj.create(item, itemOptions.onchange["__default__"]);
+				}
+			}
+		});
+		// Insert the wrapper
+		var item = this.options.wrapper.call(this, containerItem, itemOptions, itemName);
+		$(item).addClass("irform-item");
+		if (itemOptions.width) {
+			$(item).css("width", itemOptions.width);
+		}
+		// Associate the name of the element with the element
+		$(item).attr("data-irform", itemName);
+		// Check if it has to be set has required
+		if (itemOptions.required) {
+			$(item).addClass("required");
+		}
+		// Set flags if needed
+		if (itemOptions.disabled) {
+			Irform.queue(nameHolder, function() {
+				obj.options.disable.call(obj, true, $(this).parents(".irform-item:first"));
+			});
+		}
+		// Save data to this element
+		$(item).data("irform", itemOptions);
+		// Paste it on the DOM
+		($(container).hasClass("irform-item")) ? $(container).after(item) : $(container).append(item);
+	}
+
+	// Trigger change to all items
+	for (var i in formDescription) {
+		var itemName = formDescription[i].name;
+		// Check the element
+		var nameHolder = Irform.findNameHolder(this.container, itemName);
+		// Trigger a value change to add new items if needed
+		Irform.queue(nameHolder, function() {
+			$(this).trigger("change");
+		});
+	}
+};
+
+/**
  * Submit the form
  */
 Irform.prototype.submit = function (callback) {
@@ -343,113 +458,6 @@ Irform.prototype.submit = function (callback) {
 		form.submit();
 	}
 }
-
-/**
- * Creates a form
- */
-Irform.prototype.create = function (container, formDescription) {
-	// To generate unique Ids
-	if (typeof Irform.unique === "undefined") {
-		Irform.unique = 0;
-	}
-	for (var i in formDescription) {
-		// Save as local to pass it through callbacks
-		var obj = this;
-		var itemOptions = $.extend({
-			name: "irform" + (++Irform.unique),
-			type: this.options.defaultType,
-			required: false,
-			validate: null,
-			disabled: false,
-			// By default set item with a name set automatically as ignored
-			ignore: (typeof formDescription[i].name === "undefined") ? true : false,
-			options: {}
-		}, formDescription[i]);
-		// Read the name
-		var itemName = itemOptions.name;
-		// Assign everything back, this must be done due to the automatically generated name
-		formDescription[i] = itemOptions;
-		// Generate the element
-		var type = itemOptions["type"];
-		if (typeof this.options.fields[type] !== "function") {
-			console.log("'" + type + "' is not supported");
-			continue;
-		}
-		var containerItem = this.options.fields[type].call(this, itemName, itemOptions, function() {
-			// Remove the pending tag and execute all the pending items in the queue
-			$(this).removeClass("irform-pending");
-			Irform.queue(this);
-		});
-		var nameHolder = Irform.findNameHolder(containerItem, itemName);
-		// Define the on-change function
-		$(nameHolder).on("change", function() {
-			var value = $(this).val();
-			var item = $(this).parents(".irform-item:first");
-			var itemOptions = $(item).data("irform");
-			var name = $(this).prop("name");
-			// If there is a validate condition
-			if (value && itemOptions.validate) {
-				if (obj.validate(item, value)) {
-					obj.options.callbackSuccess.call(obj, item, name);
-				}
-				else {
-					obj.options.callbackError.call(obj, [{type: "validation", item: item, name: name, options: itemOptions}]);
-				}
-			}
-			// Validate also if the item is required and the value is non-empty
-			else if (value && $(item).hasClass("required")) {
-				obj.options.callbackSuccess.call(obj, item, name);
-			}
-			// If there is no onchange, mean there is no extra form
-			if (typeof itemOptions.onchange !== "object") {
-				return;
-			}
-			// Delete all the sub entry from this
-			if ($(this).data("nextElement")) {
-				$(item).nextUntil($(this).data("nextElement")).remove();
-			}
-			// Save the value of the next element
-			$(this).data("nextElement", $(item).next());
-			// Then add a new element
-			if (typeof itemOptions.onchange[value] === "object") {
-				obj.create(item, itemOptions.onchange[value]);
-			}
-			else if (typeof itemOptions.onchange["__default__"] === "object") {
-				obj.create(item, itemOptions.onchange["__default__"]);
-			}
-		});
-		// Insert the wrapper
-		var item = this.options.wrapper.call(this, containerItem, itemOptions, itemName);
-		$(item).addClass("irform-item");
-		// Associate the name of the element with the element
-		$(item).attr("data-irform", itemName);
-		// Check if it has to be set has required
-		if (itemOptions.required) {
-			$(item).addClass("required");
-		}
-		// Set flags if needed
-		if (itemOptions.disabled) {
-			Irform.queue(nameHolder, function() {
-				obj.options.disable.call(obj, true, $(this).parents(".irform-item:first"));
-			});
-		}
-		// Save data to this element
-		$(item).data("irform", itemOptions);
-		// Paste it on the DOM
-		($(container).hasClass("irform-item")) ? $(container).after(item) : $(container).append(item);
-	}
-
-	// Trigger change to all items
-	for (var i in formDescription) {
-		var itemName = formDescription[i].name;
-		// Check the element
-		var nameHolder = Irform.findNameHolder(this.container, itemName);
-		// Trigger a value change to add new items if needed
-		Irform.queue(nameHolder, function() {
-			$(this).trigger("change");
-		});
-	}
-};
 
 /**
  * Disable all elements of the form
@@ -687,7 +695,7 @@ Irform.get = function (selector, callback) {
 			var value = ($(this).hasClass("irform-container")) ?
 					Irform.get($(this).children()) :
 					($(this).is("input[type=checkbox]")) ?
-					$(this).is(":checked") : $(this).val();
+					(($(this).is(":checked")) ? 1 : "") : $(this).val();
 			// Call the callback if any
 			if (typeof callback === "function") {
 				var result = callback.call(this, key, value);

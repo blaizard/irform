@@ -147,6 +147,7 @@ $disableTextColor: #777;
 	background-color: $disableBgColor;
 	transition: none;
 	box-shadow: none;
+	cursor: not-allowed;
 }
 %disable-text {
 	color: $disableTextColor;
