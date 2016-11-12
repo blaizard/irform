@@ -107,14 +107,14 @@ $disableTextColor: #777;
 }
 
 %hover {
-	border: #35a5e5 1px solid;
+	border-color: #35a5e5;
 	box-shadow: 0 0 5px rgba(81, 203, 238, 1);
 	-webkit-box-shadow: 0 0 5px rgba(81, 203, 238, 1);
 	-moz-box-shadow: 0 0 5px rgba(81, 203, 238, 1);
 }
 
 %focus {
-	border: #35a5e5 1px solid;
+	border-color: #35a5e5;
 	box-shadow: 0 0 5px rgba(81, 203, 238, 1);
 	-webkit-box-shadow: 0 0 5px rgba(81, 203, 238, 1);
 	-moz-box-shadow: 0 0 5px rgba(81, 203, 238, 1);
