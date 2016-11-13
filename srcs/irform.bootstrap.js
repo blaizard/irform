@@ -109,13 +109,13 @@ Irform.defaultOptions.disable = function(isDisabled, elt) {
 			order: 4
 		});
 	};
-	$.fn.irformArrayKeywords.defaults.template = "<span style=\"margin-right: 10px;\">" +
-						"<span class=\"irform-array-keywords-edit\">" +
+	$.fn.irformArrayTags.defaults.template = "<span style=\"margin-right: 10px;\">" +
+						"<span class=\"irform-array-tags-edit\">" +
 							"<span class=\"irform-array-item-left glyphicon glyphicon-triangle-left\" aria-hidden=\"true\"></span>" +
 							"<form class=\"form-inline\" style=\"display: inline-block;\"><input type=\"text\" class=\"form-control\" name=\"keyword\"/></form>" +
 							"<span class=\"irform-array-item-right glyphicon glyphicon-triangle-right\" aria-hidden=\"true\"></span>" +
 						"</span>" +
-						"<button type=\"button\" class=\"irform-array-keywords-tag btn btn-default\" style=\"display: none;\">" +
+						"<button type=\"button\" class=\"irform-array-tags-tag btn btn-default\" style=\"display: none;\">" +
 							"<span></span>" +
 							"<span class=\"irform-array-item-del glyphicon glyphicon-remove\" style=\"margin-left: 10px;\" aria-hidden=\"true\"></span>" +
 						"</button>" +

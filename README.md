@@ -13,6 +13,12 @@ This library can also be easily adapted to support any UI. Bootstrap is currentl
 * Lightweight
 * Extensible
 * Non-intrusive [(1)](#non-intrusive)
+* Supports:
+  * All basics elements (input, password, textarea...)
+  * Tags
+  * Switches
+  * Arrays
+  * Modals
 
 ## &#10003; Try the [examples](https://www.blaizard.com/projects/irform/examples)
 

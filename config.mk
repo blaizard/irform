@@ -2,7 +2,7 @@ BASE_SRCS := \
 	srcs/irrequire.min.js \
 	srcs/irform.js \
 	srcs/jquery.irform-array.js \
-	srcs/jquery.irform-array.keywords.js \
+	srcs/jquery.irform-array.tags.js \
 	srcs/jquery.irform-tinymce.js \
 	srcs/jquery.irform-file.js \
 	srcs/jquery.irform-modal.js \
@@ -24,10 +24,6 @@ process-stamp_maincss: OUTPUT := css/irform.min.css
 process-stamp_maincss: INPUT := \
 	theme/default/icon.css \
 	theme/default/main.scss
-
-# theme/default/fonts
-copy_mainfont: INPUT := theme/default/fonts
-copy_mainfont: OUTPUT := css
 
 # Bootstrap -------------------------------------------------------------------
 

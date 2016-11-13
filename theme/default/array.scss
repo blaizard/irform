@@ -14,7 +14,7 @@
 	order: 1;
 }
 .irform-array-item.inline {
-		margin-right: 5px;
+	margin-right: 5px;
 }
 .irform-array-item:hover {
 	.irform-array-item-up,
@@ -42,4 +42,8 @@
 }
 .irform-array-item-del {
 	order: 4;
+}
+
+.irform-array-tags-tag .irform-array-item-del {
+	display: inline-block;
 }

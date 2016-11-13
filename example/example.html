@@ -7,7 +7,7 @@
 		<script src="../srcs/irrequire.min.js"></script>
 		<script src="../srcs/irform.js"></script>
 		<script src="../srcs/jquery.irform-array.js"></script>
-		<script src="../srcs/jquery.irform-array.keywords.js"></script>
+		<script src="../srcs/jquery.irform-array.tags.js"></script>
 		<script src="../srcs/jquery.irform-tinymce.js"></script>
 		<script src="../srcs/jquery.irform-file.js"></script>
 		<script src="../srcs/irform.irexplorer.js"></script>
@@ -68,7 +68,7 @@
 				{name: "checkbox", caption: "Checkbox", type: "checkbox", list: ["hello", "yes"], inline: true},
 				{name: "checkbox2", caption: "Checkbox", type: "checkbox", list: ["hello", "yes"]},
 				{name: "switch", caption: "Switch", type: "switch"},
-				{name: "keywords", caption: "Keywords", disabled: false, type: "keywords"},
+				{name: "tags", caption: "Tags", disabled: false, type: "tags"},
 				{name: "file", caption: "File", type: "file"},
 				{name: "car", caption: "Car", type: "select", description: "What car do you drive?", list: {
 						none: "None",
@@ -78,7 +78,7 @@
 						__default__: [
 							{name: "model", caption: "Model", required: true, type: "input"},
 							{name: "year", caption: "Year", disabled: true, type: "input"},
-							{name: "cities", caption: "Cities you have been to", type: "keywords"}
+							{name: "cities", caption: "Cities you have been to", type: "tags"}
 						],
 						none: []
 					}

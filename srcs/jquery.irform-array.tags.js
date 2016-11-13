@@ -2,26 +2,26 @@
 	/**
 	 * \brief Preset for keyword module
 	 *
-	 * \alias jQuery.irformArrayKeywords
+	 * \alias jQuery.irformArrayTags
 	 */
-	$.fn.irformArrayKeywords = function(options) {
-		$(this).irformArray($.extend(true, $.fn.irformArrayKeywords.defaults, options));
+	$.fn.irformArrayTags = function(options) {
+		$(this).irformArray($.extend(true, $.fn.irformArrayTags.defaults, options));
 	};
 
 	/**
 	 * \brief Default options, can be overwritten. These options are used to customize the object.
 	 * Change default values:
-	 * \code $().irformArrayKeywords.defaults.theme = "aqua"; \endcode
+	 * \code $().irformArrayTags.defaults.theme = "aqua"; \endcode
 	 * \type Array
 	 */
-	$.fn.irformArrayKeywords.defaults = {
+	$.fn.irformArrayTags.defaults = {
 		template: "<span>" +
-						"<span class=\"irform-array-keywords-edit\">" +
+						"<span class=\"irform-array-tags-edit\">" +
 							"<button class=\"irform-array-item-left irform dock-right\" type=\"button\"><span class=\"icon-arrow-left\"></span></button>" +
 							"<input type=\"text\" class=\"irform inline dock-left dock-right\" name=\"keyword\"/>" +
 							"<button class=\"irform-array-item-right irform dock-left\" type=\"button\"><span class=\"icon-arrow-right\"></span></button>" +
 						"</span>" +
-						"<span class=\"irform-array-keywords-tag irform border inline clickable\" style=\"display: none;\">" +
+						"<span class=\"irform-array-tags-tag irform border inline clickable\" style=\"display: none;\">" +
 							"<span></span>" +
 							"<span class=\"irform-array-item-del\" style=\"margin-left: 10px;\"><span class=\"icon-cross\"></span></span>" +
 						"</span>" +
@@ -31,8 +31,8 @@
 		inline: true,
 		hookAdd: function(item) {
 			var obj = this;
-			var edit = $(item).find(".irform-array-keywords-edit");
-			var tag = $(item).find(".irform-array-keywords-tag");
+			var edit = $(item).find(".irform-array-tags-edit");
+			var tag = $(item).find(".irform-array-tags-tag");
 			$(item).find("input").on("blur", function() {
 				var value = $(this).val();
 				// If the value is empty, then delete the item
@@ -106,8 +106,8 @@
 })(jQuery);
 
 /* Add the module to Irform */
-Irform.defaultOptions.fields.keywords = function(name) {
+Irform.defaultOptions.fields.tags = function(name) {
 	var div = $("<div>");
-	div.irformArrayKeywords({name: name});
+	div.irformArrayTags({name: name});
 	return div;
 };
