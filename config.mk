@@ -1,6 +1,7 @@
 BASE_SRCS := \
 	srcs/irrequire.min.js \
 	srcs/irform.js \
+	srcs/irform.notify.js \
 	srcs/jquery.irform-array.js \
 	srcs/jquery.irform-array.tags.js \
 	srcs/jquery.irform-tinymce.js \

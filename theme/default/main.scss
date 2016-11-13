@@ -17,7 +17,8 @@ $disableBgColor: #eee;
 $disableTextColor: #777;
 
 .irform,
-.irform-item {
+.irform-item,
+%irform {
 	font-family: "Helvetica";
 	font-size: 14px;
 	line-height: 16px;
@@ -98,6 +99,14 @@ $disableTextColor: #777;
 	}
 }
 
+%clickable-text {
+	opacity: 0.5;
+	cursor: pointer;
+	&:hover {
+		opacity: 1;
+	}
+}
+
 .irform.inline,
 .irform-inline,
 .irform-array-item.inline,
@@ -168,4 +177,6 @@ $disableTextColor: #777;
 @import "array.scss";
 @import "checkbox.scss";
 @import "switch.scss";
+@import "notify.scss";
+@import "modal.scss";
 @import "tinymce.scss";

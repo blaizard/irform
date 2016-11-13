@@ -1,0 +1,37 @@
+.irnotify {
+	width: 100%;
+	> div {
+		margin: 5px 0;
+	}
+	> .error {
+		background-color: #f2dede;
+		@extend %error;
+	}
+	> .success {
+		background-color: #dff0d8;
+		@extend %success;
+	}
+	> .info {
+		background-color: #d9edf7;
+	}
+	> .warning {
+		background-color: #fcf8e3;
+	}
+}
+
+.irnotify-entry {
+	@extend %irform;
+	padding: 5px 10px;
+	displaY: flex;
+	flex-flow: row nowrap;
+	.message {
+		width: 100%;
+	}
+	.delete {
+		margin-left: 10px;
+		flex-shrink: 0;
+		width: auto;
+		text-align: right;
+		@extend %clickable-text;
+	}
+}

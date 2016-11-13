@@ -44,6 +44,8 @@
 	order: 4;
 }
 
+/* Tags specific */
 .irform-array-tags-tag .irform-array-item-del {
 	display: inline-block;
+	@extend %clickable-text;
 }

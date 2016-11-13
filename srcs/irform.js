@@ -205,30 +205,39 @@ Irform.defaultOptions = {
 	 * This function will be called in case of error (validation, missing value)
 	 */
 	callbackError: function(errorList) {
-		var msg = "";
 		// Clean previous error
 		$(this.container).find(".irform-item.error").removeClass("error");
 		for (var i in errorList) {
+			var msg = "";
+			var id = null;
+			var e = errorList[i];
 			// Set error
 			$(errorList[i]["item"]).removeClass("success").addClass("error");
-			switch (errorList[i]["type"]) {
+			var name = e["options"]["caption"] || e["name"];
+			switch (e["type"]) {
 			case "required":
-				msg += "'" + errorList[i]["name"] + "' is required\n";
+				msg = "<b>" + name + "</b> is required\n";
+				id = "required-" + e["name"];
 				break;
 			case "validation":
-				msg += "'" + errorList[i]["name"] + "' does not validate\n";
+				msg = "<b>" + name + "</b> does not validate\n";
+				id = "validation-" + e["name"];
 				break;
 			}
+			if (msg) {
+				Irnotify(msg, {container: this.container, type: "error", id: id});
+			}
 		}
-		alert(msg);
 	},
 	/**
 	 * Called once an item has been validated successfully
 	 * \param item
 	 * \param name
 	 */
-	callbackSuccess: function(item/*, name*/) {
+	callbackSuccess: function(item, name) {
 		$(item).removeClass("error").addClass("success");
+		Irnotify.delete("required-" + name);
+		Irnotify.delete("validation-" + name);
 	},
 	/**
 	 * Called once an item needs to be disabled
