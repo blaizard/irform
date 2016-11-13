@@ -17,7 +17,7 @@ This library can also be easily adapted to support any UI. Bootstrap is currentl
   * All basics elements (input, password, textarea...)
   * Tags
   * Switches
-  * Arrays
+  * Arrays [(2)](#arrays)
   * Modals
 
 ## &#10003; Try the [examples](https://www.blaizard.com/projects/irform/examples)
@@ -26,4 +26,5 @@ This library can also be easily adapted to support any UI. Bootstrap is currentl
 
 ## &#10003; Read the [documentation](https://www.blaizard.com/projects/irform/documentation)
 
-<a name="non-intrusive">(1)</a> Can be used with an existing form without modification.
+<a name="non-intrusive">(1)</a> Can be used with an existing form without modification.<br/>
+<a name="arrays">(2)</a> Arrays are modular elements that can contain multiple occurence of similar sub-elements (configurable through templates). See the documentation for more information.<br/>
