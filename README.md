@@ -19,6 +19,7 @@ This library can also be easily adapted to support any UI. Bootstrap is currentl
   * Switches
   * Arrays [(2)](#arrays)
   * Modals
+  * Notifications
 
 ## &#10003; Try the [examples](https://www.blaizard.com/projects/irform/examples)
 
