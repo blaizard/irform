@@ -88,6 +88,7 @@ $disableTextColor: #777;
 .irform.clickable,
 %clickable {
 	cursor: pointer;
+	transition: background-color 0.4s ease;
 	&:hover {
 		@extend %hover;
 		background-color: #fff;
@@ -124,18 +125,22 @@ $disableTextColor: #777;
 .irform-item.error,
 %error {
 	color: $errorTextColor;
+	transition: color 0.4s ease;
 }
 %error-border {
 	border-color: $errorBorderColor;
+	transition: border-color 0.4s ease;
 }
 
 // Success specific
 .irform-item.success,
 %success {
 	color: $successTextColor;
+	transition: color 0.4s ease;
 }
 %success-border {
 	border-color: $successBorderColor;
+	transition: border-color 0.4s ease;
 }
 
 // Disable
@@ -145,12 +150,14 @@ $disableTextColor: #777;
 %disable {
 	color: $disableTextColor;
 	background-color: $disableBgColor;
-	transition: none;
+	transition: color 0.4s ease;
+	transition: background-color 0.4s ease;
 	box-shadow: none;
 	cursor: not-allowed;
 }
 %disable-text {
 	color: $disableTextColor;
+	transition: color 0.4s ease;
 }
 
 @import "layout.scss";
