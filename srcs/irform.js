@@ -23,7 +23,7 @@ var Irform = function (container, formDescription, options) {
 	// Empty the container first
 	this.container.empty();
 	// Set the class
-	$(this.container).addClass("irform-layout");
+	this.container.addClass("irform-layout");
 	// Call the hook
 	this.options.hookInit.call(this);
 	// Create the form
@@ -51,17 +51,21 @@ Irform.CHAR_SPACE = 0x04;
  */
 Irform.CHAR_SPECIAL = 0x08;
 /**
+ * \brief Validates with dashes and underscores
+ */
+Irform.CHAR_DASH = 0x10;
+/**
  * \brief Validates upper case charaters only
  */
-Irform.CHAR_UPPERCASE_ONLY = 0x10;
+Irform.CHAR_UPPERCASE_ONLY = 0x20;
 /**
  * \brief Validates lower case characters only
  */
-Irform.CHAR_LOWERCASE_ONLY = 0x20;
+Irform.CHAR_LOWERCASE_ONLY = 0x40;
 /**
  * \brief Validates emails
  */
-Irform.EMAIL = "^[A-Za-z0-9\._%\+\-]+@[A-Za-z0-9\.\-]+\.[a-zA-Z]{2,}$";
+Irform.EMAIL = {rule: "^[A-Za-z0-9\._%\+\-]+@[A-Za-z0-9\.\-]+\.[a-zA-Z]{2,}$", msg: "Please enter a valid email"};
 //! \}
 
 /**
@@ -206,26 +210,25 @@ Irform.defaultOptions = {
 	 */
 	callbackError: function(errorList) {
 		// Clean previous error
-		$(this.container).find(".irform-item.error").removeClass("error");
+		this.container.find(".irform-item.error").removeClass("error");
 		for (var i in errorList) {
 			var msg = "";
 			var id = null;
 			var e = errorList[i];
 			// Set error
-			$(errorList[i]["item"]).removeClass("success").addClass("error");
-			var name = e["options"]["caption"] || e["name"];
+			$(e["item"]).removeClass("success").addClass("error");
 			switch (e["type"]) {
 			case "required":
-				msg = "<b>" + name + "</b> is required\n";
+				msg = "This field is required";
 				id = "required-" + e["name"];
 				break;
 			case "validation":
-				msg = "<b>" + name + "</b> does not validate\n";
+				msg = (e["msg"]) ? e["msg"] : "This field does not validate";
 				id = "validation-" + e["name"];
 				break;
 			}
 			if (msg) {
-				Irnotify(msg, {container: this.container, type: "error", id: id});
+				Irnotify(msg, {container: $(e["item"]).find(".irform-elements"), type: "error", id: id});
 			}
 		}
 	},
@@ -236,8 +239,14 @@ Irform.defaultOptions = {
 	 */
 	callbackSuccess: function(item, name) {
 		$(item).removeClass("error").addClass("success");
-		Irnotify.delete("required-" + name);
-		Irnotify.delete("validation-" + name);
+		Irnotify.delete("*", item);
+	},
+	/**
+	 * This function is called to clean-up remaining notifications
+	 * if needed.
+	 */
+	callbackClean: function() {
+		Irnotify.delete("*", this.container);
 	},
 	/**
 	 * Called once an item needs to be disabled
@@ -264,31 +273,41 @@ Irform.defaultOptions = {
 
 Irform.validate = function (presets, value) {
 	if (typeof value === "string") {
-		/* Check if the upper case condition is set */
-		if (presets & Irform.CHAR_UPPERCASE_ONLY && value.test(/[a-z]/g)) {
-			return false;
+		var msg = [];
+		// Check if the upper case condition is set
+		if ((presets & Irform.CHAR_UPPERCASE_ONLY) && /[a-z]/g.test(value)) {
+			return "This field must be upper case only";
 		}
-		/* Check if the lower case condition is set */
-		if (presets & Irform.CHAR_LOWERCASE_ONLY && value.test(/[A-Z]/g)) {
-			return false;
+		// Check if the lower case condition is set
+		if ((presets & Irform.CHAR_LOWERCASE_ONLY) && /[A-Z]/g.test(value)) {
+			return "This field must be lower case only";
 		}
-		/* Replace all a-z characters regardless of the case */
+		// Replace all a-z characters regardless of the case
 		if (presets & Irform.CHAR_A_Z) {
 			value = value.replace(/[a-z]/ig, "");
+			msg.push("alphanumeric characters"); 
 		}
-		/* Replace all numbers */
+		// Replace all numbers
 		if (presets & Irform.CHAR_0_9) {
 			value = value.replace(/[0-9]/g, "");
+			msg.push("numbers"); 
 		}
-		/* Replace all spaces */
+		// Replace all numbers
+		if (presets & Irform.CHAR_DASH) {
+			value = value.replace(/-_/g, "");
+			msg.push("underscores (_), dashes (-)"); 
+		}
+		// Replace all spaces
 		if (presets & Irform.CHAR_SPACE) {
 			value = value.replace(/[ ]/g, "");
+			msg.push("spaces"); 
 		}
-		/* Replace all special characters */
+		// Replace all special characters
 		if (presets & Irform.CHAR_SPECIAL) {
 			value = value.replace(/[!"#\$%&'\(\)\*\+,\-\.\/:;<=>\?@\[\\\]^_`\{\|\}~]/g, "");
+			msg.push("special characters"); 
 		}
-		return (value === "") ? true : false;
+		return (value === "" || !msg.length) ? true : "This field only accepts " + msg.join(", ");
 	}
 	return true;
 }
@@ -347,14 +366,14 @@ Irform.prototype.create = function (container, formDescription) {
 			var value = Irform.get(this)[name];
 			var item = $(this).parents(".irform-item:first");
 			var itemOptions = $(item).data("irform");
-
 			// If there is a validate condition
 			if (!Irform.isEmpty(value) && itemOptions.validate) {
-				if (obj.validate(item, value)) {
+				var msg = obj.validate(item, value);
+				if (msg === true) {
 					obj.options.callbackSuccess.call(obj, item, name);
 				}
 				else {
-					obj.options.callbackError.call(obj, [{type: "validation", item: item, name: name, options: itemOptions}]);
+					obj.options.callbackError.call(obj, [{type: "validation", msg: msg, item: item, name: name, options: itemOptions}]);
 				}
 			}
 			// Validate also if the item is required and the value is non-empty
@@ -433,8 +452,8 @@ Irform.prototype.submit = function (callback) {
 	// If this is part of a form, submit the form
 	else if (this.container.is("form")) {
 		var form = $("<form>", {
-			action: $(this.container).prop("action"),
-			method: $(this.container).prop("method") || "POST",
+			action: this.container.prop("action"),
+			method: this.container.prop("method") || "POST",
 			enctype: "multipart/form-data",
 			style: "display: none;"
 		});
@@ -459,7 +478,7 @@ Irform.prototype.submit = function (callback) {
 		var data = createDataRec(values, "");
 		$(form).html(data);
 		// Note: file upload works only with POST and enctype="multipart/form-data"
-		$(this.container).find("input[type=file]").each(function() {
+		this.container.find("input[type=file]").each(function() {
 			$(this).appendTo(form);
 		});
 		// Need to append to the DOM the form before submitting it (at least for IE & FF)
@@ -467,6 +486,14 @@ Irform.prototype.submit = function (callback) {
 		form.submit();
 	}
 }
+
+/**
+ * Find the name holder
+ */
+Irform.prototype.findNameHolder = function (name) {
+	return Irform.findNameHolder(this.container, name);
+};
+
 
 /**
  * Disable all elements of the form
@@ -513,19 +540,56 @@ Irform.prototype.ignore = function (item, isIgnore) {
  */
 Irform.prototype.validate = function (item, value) {
 	var data = $(item).data("irform");
-	// Called the function to test the validation
-	if (typeof data.validate === "number") {
-		return Irform.validate(data.validate, value);
-	}
-	else if (typeof data.validate === "string") {
-		var re = new RegExp(data.validate, "g");
-		return re.test(value);
-	}
-	else if (typeof data.validate === "function") {
-		return data.validate.call(this, value, item);
-	}
-	// By default the validation passed
-	return true;
+	var validateFct = function selfRec(item, value, validate, msg) {
+		// Helper function
+		var returnResult = function(res) {
+			return (res === true) ? true : (msg) ? msg : res;
+		};
+
+		// Make validate an if not already, to support multiples validation
+		if ($.isArray(validate)) {
+			for (var i in validate) {
+				var result = selfRec.call(this, item, value, validate[i], msg);
+				if (result !== true) {
+					return result;
+				}
+			}
+		}
+		// Process the validation
+		else {
+			// Check if there is a custom message
+			if (typeof validate === "object") {
+				msg = validate.msg;
+				validate = validate.rule;
+			}
+			// Called the function to test the validation
+			if (typeof validate === "number") {
+				return returnResult(Irform.validate(validate, value));
+			}
+			// If string it can a mirror to another field or a regular expression
+			else if (typeof validate === "string") {
+				// Check if the string has non special characters && a field with this name exists
+				var nameHolderMirror;
+				if (Irform.validate(Irform.CHAR_A_Z | Irform.CHAR_0_9 | Irform.CHAR_DASH, validate) === true) {
+					var nameHolderMirror = this.findNameHolder(validate);
+					if (nameHolderMirror.length) {
+						return returnResult((value == nameHolderMirror.val()) ? true : "This field does not match '" + validate + "'");
+					}
+				}
+				var re = new RegExp(validate, "g");
+				return returnResult((re.test(value)) ? true : null);
+			}
+			else if (typeof validate === "function") {
+				return returnResult(validate.call(this, value, item));
+			}
+		}
+
+		// By default the validation passed
+		return true;
+	};
+
+	// Call the validation function
+	return validateFct.call(this, item, value, data.validate, null);
 };
 
 /**
@@ -556,6 +620,9 @@ Irform.prototype.get = function (callback, force) {
 	this.each(function(item) {
 		selector = selector.add($("[name=" + $(item).attr("data-irform") + "]"));
 	});
+	// Cleanup all the elements
+	this.options.callbackClean.call(this);
+	// Get the data
 	var result = Irform.get(selector, function (key, value) {
 		var item = $(this).parents(".irform-item:first");
 		var data = item.data("irform");
@@ -572,9 +639,12 @@ Irform.prototype.get = function (callback, force) {
 			isError = true;
 		}
 		// If this element needs to be validated
-		if (data.validate && !obj.validate(item, value)) {
-			errorList.push({type: "validation", item: item, name: key, options: data});
-			isError = true;
+		if (data.validate) {
+			var result = obj.validate(item, value);
+			if (result !== true) {
+				errorList.push({type: "validation", msg: result, item: item, name: key, options: data});
+				isError = true;
+			}
 		}
 		// If there is a callback
 		if (typeof callback === "function") {
@@ -704,7 +774,7 @@ Irform.get = function (selector, callback) {
 			var value = ($(this).hasClass("irform-container")) ?
 					Irform.get($(this).children()) :
 					($(this).is("input[type=checkbox]")) ?
-					(($(this).is(":checked")) ? 1 : "") : $(this).val();
+					(($(this).is(":checked")) ? "selected" : "") : $(this).val();
 			// Call the callback if any
 			if (typeof callback === "function") {
 				var result = callback.call(this, key, value);

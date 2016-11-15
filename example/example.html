@@ -21,6 +21,24 @@
 		<script src="ircom/ircom.js"></script>
 	</head>
 	<body>
+		<h1>Password</h1>
+		<form id="myFormPassword" action="../handler/" method="post"></form>
+		<script type="text/javascript">
+		    var irform = new Irform("#myFormPassword", [
+		        {name: "username", caption: "Username", type: "input", required: true, validate: [Irform.EMAIL, Irform.CHAR_LOWERCASE_ONLY]},
+		        {name: "password", caption: "Password", type: "password", required: true},
+		        {name: "test", caption: "Test", type: "input", validate: [Irform.CHAR_A_Z | Irform.CHAR_0_9 | Irform.CHAR_DASH, function(value) {
+		        	return value.length > 4;	
+		        }]},
+		        {name: "new", caption: "New user?", type: "switch", onchange: {
+		            "selected": [
+		                {name: "repassword", caption: "Re-Enter Password", type: "password", required: true, validate: "password"},
+		            ]
+		        }},
+		        {type: "submit", value: "Ok"}
+		    ]);
+		</script>
+
 		<h1>Static form</h1>
 		<form id="example1">
 			First name:<br>

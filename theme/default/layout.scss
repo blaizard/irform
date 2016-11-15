@@ -30,11 +30,6 @@
 	width: 100%;
 }
 
-/* Notification */
-.irform-layout .irnotify {
-	margin-left: 160px;
-}
-
 @media screen and (max-width: 768px) {
 	.irform-item {
 		flex-flow: column nowrap;
@@ -49,9 +44,5 @@
 
 	.irform-elements {
 		padding-left: 0;
-	}
-
-	.irform-layout .irnotify {
-		margin-left: 0;
 	}
 }

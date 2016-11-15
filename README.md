@@ -13,7 +13,8 @@ This library can also be easily adapted to support any UI. Bootstrap is currentl
 * Lightweight
 * Extensible
 * Non-intrusive [(1)](#non-intrusive)
-* Supports:
+* Validation
+* Field supported:
   * All basics elements (input, password, textarea...)
   * Tags
   * Switches

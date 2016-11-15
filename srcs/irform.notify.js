@@ -6,9 +6,9 @@ var Irnotify = function (message, options) {
 	options = $.extend(true, {}, Irnotify.defaults, options);
 	// Check if the notification container exists, if not create it
 	var container = options.container;
-	// Check if the id exists, if so do nothing
-	if (options.id && $(container).find(".irnotify-id-" + options.id).length) {
-		return;
+	// Check if the id exists, if so delete it
+	if (options.id) {
+		Irnotify.delete(options.id, container);
 	}
 	var containerNotify = $(container).children(".irnotify");
 	if (!containerNotify.length) {
@@ -53,22 +53,24 @@ var Irnotify = function (message, options) {
 /**
  * Deletes an item previously created
  */
-Irnotify.delete = function(item) {
+Irnotify.delete = function(item, container) {
 	if (typeof item == "string") {
-		item = $("body").find(".irnotify-id-" + item);
+		item = $(container || "body").find((item == "*") ? "[class*=irnotify-id-]" : (".irnotify-id-" + item));
 	}
-	item = $(item).closest(".irnotify-entry");
-	var parent = item.parent();
-	item.remove();
-	// Check if the group is empty
-	if (parent.hasClass("irnotify-group") && !parent.children().length) {
-		item = parent;
-		parent = item.parent();
+	$(item).closest(".irnotify-entry").each(function() {
+		var item = $(this);
+		var parent = item.parent();
 		item.remove();
-	}
-	if (parent.hasClass("irnotify") && !parent.children().length) {
-		parent.remove();
-	}
+		// Check if the group is empty
+		if (parent.hasClass("irnotify-group") && !parent.children().length) {
+			item = parent;
+			parent = item.parent();
+			item.remove();
+		}
+		if (parent.hasClass("irnotify") && !parent.children().length) {
+			parent.remove();
+		}
+	});
 };
 
 /**
