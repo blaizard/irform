@@ -465,6 +465,12 @@ Irform.mask = function (obj, mask) {
 				break;
 			}
 		}
+		// Handle characters & numbers
+		else if (mask[i] == "*") {
+			if (/[^a-z0-9]/i.test(c)) {
+				break;
+			}
+		}
 		// Handle hard-coded characters
 		else if (mask[i] != c) {
 			newValue += mask[i];
