@@ -556,32 +556,28 @@ Irform.prototype.validate = function (item, value) {
 			}
 		}
 		// Process the validation
-		else {
-			// Check if there is a custom message
-			if (typeof validate === "object") {
-				msg = validate.msg;
-				validate = validate.rule;
-			}
-			// Called the function to test the validation
-			if (typeof validate === "number") {
-				return returnResult(Irform.validate(validate, value));
-			}
-			// If string it can a mirror to another field or a regular expression
-			else if (typeof validate === "string") {
-				// Check if the string has non special characters && a field with this name exists
-				var nameHolderMirror;
-				if (Irform.validate(Irform.CHAR_A_Z | Irform.CHAR_0_9 | Irform.CHAR_DASH, validate) === true) {
-					var nameHolderMirror = this.findNameHolder(validate);
-					if (nameHolderMirror.length) {
-						return returnResult((value == nameHolderMirror.val()) ? true : "This field does not match '" + validate + "'");
-					}
+		else if (typeof validate === "object") {
+			return selfRec.call(this, item, value, validate.rule, validate.msg);
+		}
+		// Called the function to test the validation
+		else if (typeof validate === "number") {
+			return returnResult(Irform.validate(validate, value));
+		}
+		// If string it can a mirror to another field or a regular expression
+		else if (typeof validate === "string") {
+			// Check if the string has non special characters && a field with this name exists
+			var nameHolderMirror;
+			if (Irform.validate(Irform.CHAR_A_Z | Irform.CHAR_0_9 | Irform.CHAR_DASH, validate) === true) {
+				var nameHolderMirror = this.findNameHolder(validate);
+				if (nameHolderMirror.length) {
+					return returnResult((value == nameHolderMirror.val()) ? true : "This field does not match '" + validate + "'");
 				}
-				var re = new RegExp(validate, "g");
-				return returnResult((re.test(value)) ? true : null);
 			}
-			else if (typeof validate === "function") {
-				return returnResult(validate.call(this, value, item));
-			}
+			var re = new RegExp(validate, "g");
+			return returnResult((re.test(value)) ? true : null);
+		}
+		else if (typeof validate === "function") {
+			return returnResult(validate.call(this, value, item));
 		}
 
 		// By default the validation passed
