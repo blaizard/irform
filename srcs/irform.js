@@ -339,6 +339,7 @@ Irform.prototype.create = function (container, formDescription) {
 			type: this.options.defaultType,
 			required: false,
 			validate: null,
+			mask: null,
 			disabled: false,
 			// By default set item with a name set automatically as ignored
 			ignore: (typeof formDescription[i].name === "undefined") ? true : false,
@@ -364,7 +365,7 @@ Irform.prototype.create = function (container, formDescription) {
 		$(nameHolder).on("change", function() {
 			var name = $(this).prop("name") || $(this).attr("name");
 			var value = Irform.get(this)[name];
-			var item = $(this).parents(".irform-item:first");
+			var item = $(this).closest(".irform-item");
 			var itemOptions = $(item).data("irform");
 			// If there is a validate condition
 			if (!Irform.isEmpty(value) && itemOptions.validate) {
@@ -415,7 +416,14 @@ Irform.prototype.create = function (container, formDescription) {
 		// Set flags if needed
 		if (itemOptions.disabled) {
 			Irform.queue(nameHolder, function() {
-				obj.options.disable.call(obj, true, $(this).parents(".irform-item:first"));
+				obj.options.disable.call(obj, true, $(this).closest(".irform-item"));
+			});
+		}
+		// If it has input masking, set the filter
+		if (itemOptions.mask) {
+			$(nameHolder).keyup(function() {
+				var itemOptions = $(this).closest(".irform-item").data("irform");
+				Irform.mask(this, itemOptions.mask);
 			});
 		}
 		// Save data to this element
@@ -434,6 +442,38 @@ Irform.prototype.create = function (container, formDescription) {
 			$(this).trigger("change");
 		});
 	}
+};
+
+/**
+ * Mask an item with the specific filter
+ */
+Irform.mask = function (obj, mask) {
+	var value = $(obj).val();
+	var newValue = "";
+	for (var i = 0; i<mask.length && value; i++) {
+		// Pop the first character
+		var c = value[0];
+		// Handle numbers
+		if (mask[i] == "9") {
+			if (/[^0-9]/.test(c)) {
+				break;
+			}
+		}
+		// Handle characters
+		else if (mask[i] == "z") {
+			if (/[^a-z]/i.test(c)) {
+				break;
+			}
+		}
+		// Handle hard-coded characters
+		else if (mask[i] != c) {
+			newValue += mask[i];
+			continue;
+		}
+		newValue += c;
+		value = value.substr(1);
+	}
+	$(obj).val(newValue);
 };
 
 /**
@@ -620,7 +660,7 @@ Irform.prototype.get = function (callback, force) {
 	this.options.callbackClean.call(this);
 	// Get the data
 	var result = Irform.get(selector, function (key, value) {
-		var item = $(this).parents(".irform-item:first");
+		var item = $(this).closest(".irform-item");
 		var data = item.data("irform");
 		if (force) {
 			return;

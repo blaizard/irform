@@ -14,6 +14,7 @@ This library can also be easily adapted to support any UI. Bootstrap is currentl
 * Extensible [(1)](#extensible)
 * Support nested types
 * Validation
+* Input Masking
 * Modals
 * Notifications
 * Field supported:
@@ -29,5 +30,5 @@ This library can also be easily adapted to support any UI. Bootstrap is currentl
 
 ## &#10003; Read the [documentation](https://www.blaizard.com/projects/irform/documentation)
 
-<a name="extensible">(1)</a> Can add pnew fields.<br/>
+<a name="extensible">(1)</a> Can add new fields.<br/>
 <a name="arrays">(2)</a> Arrays are modular elements that can contain multiple occurence of similar sub-elements (configurable through templates). See the documentation for more information.<br/>
