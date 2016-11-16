@@ -421,12 +421,9 @@ Irform.prototype.create = function (container, formDescription) {
 		}
 		// If it has input masking, set the filter
 		if (itemOptions.mask) {
-			$(nameHolder).keydown(function() {
-				var obj = this;
-				setTimeout(function() {
-					var itemOptions = $(obj).closest(".irform-item").data("irform");
-					Irform.mask(obj, itemOptions.mask);
-				}, 1);
+			$(nameHolder).on("input", function() {
+				var itemOptions = $(this).closest(".irform-item").data("irform");
+				Irform.mask(this, itemOptions.mask);
 			});
 		}
 		// Save data to this element
