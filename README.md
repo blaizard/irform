@@ -11,16 +11,17 @@ This library can also be easily adapted to support any UI. Bootstrap is currentl
 ## Features
 
 * Lightweight
-* Extensible
-* Non-intrusive [(1)](#non-intrusive)
+* Extensible [(1)](#extensible)
+* Support nested types
 * Validation
+* Modals
+* Notifications
 * Field supported:
   * All basics elements (input, password, textarea...)
   * Tags
   * Switches
+  * WYSIWYG (HTML Editor)
   * Arrays [(2)](#arrays)
-  * Modals
-  * Notifications
 
 ## &#10003; Try the [examples](https://www.blaizard.com/projects/irform/examples)
 
@@ -28,5 +29,5 @@ This library can also be easily adapted to support any UI. Bootstrap is currentl
 
 ## &#10003; Read the [documentation](https://www.blaizard.com/projects/irform/documentation)
 
-<a name="non-intrusive">(1)</a> Can be used with an existing form without modification.<br/>
+<a name="extensible">(1)</a> Can add pnew fields.<br/>
 <a name="arrays">(2)</a> Arrays are modular elements that can contain multiple occurence of similar sub-elements (configurable through templates). See the documentation for more information.<br/>
