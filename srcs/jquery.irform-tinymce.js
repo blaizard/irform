@@ -198,25 +198,17 @@
 			]
 		}
 	};
-
-	/* Override the val function to handle this element */
-	var originalVal = $.fn.val;
-	$.fn.val = function(value) {
-		if (arguments.length) {
-			$(this).each(function() {
-				if ($(this).hasClass("irform-tinymce")) {
-					return tinyMCE.get($(this).prop("id")).setContent(value);
-				}
-				return originalVal.call(this, value);
-			});
-			return $(this);
-		}
-		if ($(this).hasClass("irform-tinymce")) {
-			return tinyMCE.get($(this).prop("id")).getContent();
-		}
-		return originalVal.apply(this, arguments);
-	};
 })(jQuery);
+
+// Hook to the jQuery.fn.val function
+Irform.jQueryHookVal(".irform-tinymce",
+	/*readFct*/function() {
+		return tinyMCE.get($(this).prop("id")).getContent();
+	},
+	/*writeFct*/function(value) {
+		return tinyMCE.get($(this).prop("id")).setContent(value);
+	}
+);
 
 /* Add the module to Irform */
 Irform.defaultOptions.fields.htmleditor = function(name, options, callback) {

@@ -1,18 +1,12 @@
 /**
- * This file handles forms in general. It adds the ability to read form values dynamically and
+ * \brief Manipulate and create dynamic forms.
+ *
+ * This class handles forms in general. It adds the ability to read form values dynamically and
  * adds multi form functionality (i.e. being able to have arrays in form).
  *
- * When create a new element that can work with Irform, the following methods/events should be implemented 
- * and attached to the tag with the "name" attribute. 
- * - Methods:
- *   - val: Sets or get the value of/from the element
- * - Events
- *   - change: to enable validation on value changed and sub element dynamic creation
- */
-
-/**
- * \brief Irform class, use to manipulate forms and create
- * \param [options] Options to be passed to the form, see \ref Irform.defaultOptions for more details.
+ * \param container The container where the form will be created
+ * \param formDescription The description of the form
+ * \param [options] Options to be passed to the form, see \see Irform.defaultOptions for more details
  */
 var Irform = function (container, formDescription, options) {
 	// Trigger require, to make sure that any pending modules are loaded
@@ -116,9 +110,7 @@ Irform.defaultOptions = {
 			});
 			var list = options.list;
 			for (var i in list) {
-				var checkbox = (list[i] instanceof Array) ?
-						createCheckbox(list[i][0], list[i][1], options.inline)
-						: createCheckbox(list[i], list[i], options.inline);
+				var checkbox = createCheckbox(((typeof i == "string") ? i : list[i]), list[i], options.inline);
 				$(container).append(checkbox);
 			}
 
@@ -158,7 +150,7 @@ Irform.defaultOptions = {
 				name: name,
 				class: "irform",
 			});
-			$(button).text(options.value || "Submit");	
+			$(button).html(options.value || "Submit");	
 			var obj = this;
 			$(button).click(function() {
 				obj.submit(options.callback);
@@ -175,7 +167,7 @@ Irform.defaultOptions = {
 				var opt = $("<option>", {
 					value: (list instanceof Array) ? list[name] : name
 				});
-				$(opt).text(list[name]);
+				$(opt).html(list[name]);
 				$(select).append(opt);
 			}
 			return select;
@@ -271,6 +263,14 @@ Irform.defaultOptions = {
 	hookInit: function() {}
 };
 
+/**
+ * \brief Validate a value from a preset.
+ *
+ * \param presets One of the validation presets defined, such as \see Irform.CHAR_A_Z or \see Irform.CHAR_DASH for example
+ * \param value The value to validate
+ *
+ * \return true in case of success or a string with a message describing the issue otherwise.
+ */
 Irform.validate = function (presets, value) {
 	if (typeof value === "string") {
 		var msg = [];
@@ -313,7 +313,8 @@ Irform.validate = function (presets, value) {
 }
 
 /**
- * This function find the name holder element from a parent element
+ * \brief This function find the name holder element from a parent element
+ * \param elt The parent element
  * \param [name] The optional name attribute
  */
 Irform.findNameHolder = function (elt, name) {
@@ -758,6 +759,7 @@ Irform.set = function (selector, values, callback) {
 		return nearestMatch.length == 0 || ($(selector).find(nearestMatch).length == 0 && $(selector).filter(nearestMatch).length == 0);
 	});
 
+	var elementProcessed = 0;
 	// Set their values
 	$(list).each(function() {
 		var key = $(this).prop("name") || $(this).attr("name");
@@ -787,8 +789,19 @@ Irform.set = function (selector, values, callback) {
 				}
 				$(this).trigger("change");
 			});
+
+			// Mark this element as proceed by removing it
+			delete values[key];
+			elementProcessed++;
 		}
 	});
+
+	// If the value is not empty, it might mean that some of the values have not been proceed
+	// in this case, re-iterate with the remaing values
+	if (!jQuery.isEmptyObject(values) && elementProcessed)
+	{
+		Irform.set(selector, values, callback);
+	}
 }
 
 /**
@@ -834,6 +847,39 @@ Irform.get = function (selector, callback) {
 
 	return data;
 }
+
+/**
+ * Update the jQuery val attribute
+ */
+Irform.jQueryHookVal = function (selector, readFct, writeFct) {
+	// Override the val function to handle this element
+	var originalVal = jQuery.fn.val;
+	jQuery.fn.val = function(value) {
+		// Read
+		if (!arguments.length) {
+			if ($(this).is(selector)) {
+				return readFct.call(this);
+			}
+			// Callback the original function
+			return originalVal.apply(this, arguments);
+		}
+		// Write
+		// Make this variable local to pas it through the each function, seems to work only this way
+		var v = value;
+		$(this).each(function() {
+			// Hack to make the variable visiable in this scope
+			var value = v;
+			if ($(this).is(selector)) {
+				writeFct.call(this, value);
+			}
+			else {
+				// Callback the original function
+				originalVal.call($(this), value);
+			}
+		});
+		return this;
+	};
+};
 
 /**
  * Clear the form. This is a static function.

@@ -62,6 +62,9 @@
 		case "create":
 			$.fn.irformModal.create.call(this);
 			break;
+		case "close":
+			$.fn.irformModal.close.call(this);
+			break;
 		};
 	};
 
@@ -69,20 +72,75 @@
 	 * \brief Default options, can be overwritten.
 	 */
 	$.fn.irformModal.defaults = {
-		zIndex: 99999
+		/**
+		 * \brief Default z-index
+		 */
+		zIndex: 99999,
+		/**
+		 * \brief Enable feature to close the window when click outise
+		 */
+		closeOnClickOutside: true,
+		/**
+		 * If the add button should be implemented
+		 */
+		isCancel: false,
+		/**
+		 * \brief Callback to be called once the user validates the modal
+		 */
+		onValidate: null,
+		/**
+		 * HTML to be used for the validate button
+		 */
+		validate: "<button class=\"irform\" type=\"button\"><span class=\"icon-check\"></span>&nbsp;Validate</button>",
+		/**
+		 * HTML to be used for the cancel button
+		 */
+		cancel: "<button class=\"irform\" type=\"button\"><span class=\"icon-cross\"></span>&nbsp;Cancel</button>",
 	};
 
 	$.fn.irformModal.create = function() {
 		// Options of the current irformModal
+		var obj = this;
 		var options = $(this).data("irformModal");
 
 		var modal = $("<div>", {
+			class: "irform-modal-container"
+		});
+
+		var content = $("<div>", {
 			class: "irform-modal-content"
 		});
-		$(modal).append(this);
-		$(modal).click(function(e) {
-			e.stopPropagation();
+		$(content).append(this);
+		$(modal).append(content);
+
+		// Add controls
+		var control = $("<div>", {
+			class: "irform-modal-control"
 		});
+
+		// Cancel button
+		if (options.isCancel) {
+			var cancel = $("<span>");
+			$(cancel).html(options.cancel);
+			$(cancel).click(function() {
+				$.fn.irformModal.close.call(obj);
+			});
+			$(control).append(cancel);
+		}
+
+		// Validate button
+		if (options.onValidate) {
+			var validate = $("<span>");
+			$(validate).html(options.validate);
+			$(validate).click(function() {
+				var options = $(obj).data("irformModal");
+				options.onValidate.call(obj);
+				$.fn.irformModal.close.call(obj);
+			});
+			$(control).append(validate);
+		}
+
+		$(modal).append(control);
 
 		var container = $("<div>", {
 			class: "irform-modal"
@@ -103,10 +161,27 @@
 		$(this).data("irformModal", options);
 
 		// Remove the element on click
-		var obj = this;
-		$(container).click(function() {
-			$.fn.irformModal.close.call(obj);
-		});
+		if (options.closeOnClickOutside) {
+			$(container).data("irformModal", 0);
+			$(container).mousedown(function(e) {
+				$(this).data("irformModal", e);
+			}).mouseup(function(e) {
+				var prevE = $(this).data("irformModal");
+				if (prevE && Math.abs(prevE.pageX - e.pageX) < 5 && Math.abs(prevE.pageY - e.pageY) < 5) {
+					e.preventDefault();
+					$.fn.irformModal.close.call(obj);
+				}
+				$(this).data("irformModal", 0);
+			});
+			// To make sure the events are not considered on the modal
+			$(modal).mousedown(function(e) {
+				e.stopPropagation();
+				return false;
+			}).mouseup(function(e) {
+				e.stopPropagation();
+				return false;
+			});
+		}
 
 		// Append the modal
 		$("body").append(container);
@@ -116,7 +191,7 @@
 	/**
 	 * This function closes the dialog
 	 */
-	$.fn.irformModal.close = function () {
+	$.fn.irformModal.close = function() {
 		// Options of the current irformModal
 		var options = $(this).data("irformModal");
 		$(options.container).remove();

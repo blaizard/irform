@@ -164,6 +164,9 @@
 		if (typeof template === "function") {
 			$(content).html(template.call(obj, item));
 		}
+		else if (typeof template === "object") {
+			new Irform(content, template);
+		}
 		else {
 			$(content).html($(template).clone(true, true));
 		}
@@ -202,12 +205,14 @@
 		$(obj).append(content);
 
 		// Set an event to add new items
-		$(obj).on("array-add", function() {
+		$(obj).on("array-add", function(e) {
+			e.stopPropagation();
 			$.fn.irformArray.add.call(obj);
 		});
 
 		// Set an event to clear all items
-		$(obj).on("array-empty", function() {
+		$(obj).on("array-empty", function(e) {
+			e.stopPropagation();
 			$.fn.irformArray.clear.call(obj);
 		});
 
@@ -294,48 +299,30 @@
 			return value;
 		}
 	};
-
-	// Override the val function to handle this element
-	var originalVal = $.fn.val;
-	$.fn.val = function(value) {
-		// Read
-		if (!arguments.length) {
-			if ($(this).hasClass("irform-array")) {
-				var value = [];
-				$(this).children(".irform-array-content:first").children(".irform-array-item").each(function(i) {
-					value[i] = Irform.get(this);
-				});
-				var options = $(this).data("irformArray");
-				return options.hookValRead.call(this, value);
-			}
-			// Callback the original function
-			return originalVal.apply(this, arguments);
-		}
-		// Write
-		// Make this variable local to pas it through the each function, seems to work only this way
-		var v = value;
-		$(this).each(function() {
-			// Hack to make the variable visiable in this scope
-			var value = v;
-			if ($(this).hasClass("irform-array")) {
-				var options = $(this).data("irformArray");
-				// Callback used to update the value if needed
-				value = options.hookValWrite.call(this, value);
-				$(this).trigger("array-empty");
-				for (var i in value) {
-					$(this).trigger("array-add");
-					var selector = $(this).children(".irform-array-content:first").children(".irform-array-item:last");
-					Irform.set(selector, value[i]);
-				}
-			}
-			else {
-				// Callback the original function
-				originalVal.call($(this), value);
-			}
-		});
-		return this;
-	};
 })(jQuery);
+
+// Hook to the jQuery.fn.val function
+Irform.jQueryHookVal(".irform-array",
+	/*readFct*/function() {
+		var value = [];
+		$(this).children(".irform-array-content:first").children(".irform-array-item").each(function(i) {
+			value[i] = Irform.get(this);
+		});
+		var options = $(this).data("irformArray");
+		return options.hookValRead.call(this, value);
+	},
+	/*writeFct*/function(value) {
+		var options = $(this).data("irformArray");
+		// Callback used to update the value if needed
+		value = options.hookValWrite.call(this, value);
+		$(this).trigger("array-empty");
+		for (var i in value) {
+			$(this).trigger("array-add");
+			var selector = $(this).children(".irform-array-content:first").children(".irform-array-item:last");
+			Irform.set(selector, value[i]);
+		}
+	}
+);
 
 // Add the module to Irform
 Irform.defaultOptions.fields.array = function(name, options) {

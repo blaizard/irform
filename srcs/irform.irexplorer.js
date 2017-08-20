@@ -48,4 +48,4 @@ irRequire("IrexplorerDialog", function() {
 		options: {mode: "directory"},
 		action: IrformFileIrexplorer
 	};
-});
+}, null, 0);

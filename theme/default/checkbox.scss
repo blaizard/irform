@@ -1,22 +1,24 @@
+$switchSize: $fieldHeight * 0.6875; //22
+
 input.irform[type=checkbox] {
 	position: absolute;
 	top: -99999px;
 	left: -99999px;
 	+ label {
 		position: relative;
-		padding-left: 30px;
+		padding-left: #{$fieldHeight - 2}px;
 		cursor: pointer;
 		@extend %single-line;
 		@extend %inline;
 		&:before {
 			margin: 5px 0;
 			content: '';
-			background-color: #fff;
+			background-color: $fieldBgColor;
 			position: absolute;
 			left: 0;
 			top: 0;
-			width: 22px;
-			height: 22px;
+			width: #{$switchSize}px;
+			height: #{$switchSize}px;
 			@extend %clickable;
 			@extend %border;
 			&:hover {
@@ -26,10 +28,10 @@ input.irform[type=checkbox] {
 	}
 	&:checked + label:after {
 		content: "\2713";
-		font-size: 18px;
+		font-size: #{$fieldTextHeight * 1.2}px;
 		font-weight: bold;
-		line-height: 32px;
-		color: #000;
+		line-height: #{$fieldHeight * 1.2}px;
+		color: $fieldTextColor;
 		position: absolute;
 		top: 0;
 		left: 4px;
@@ -39,8 +41,8 @@ input.irform[type=checkbox] {
 	}
 }
 .irform-inline input.irform[type=checkbox] + label {
-	min-width: 48px;
-	margin-right: 16px;
+	min-width: #{$fieldHeight * 1.5}px;
+	margin-right: #{$fieldHeight / 2}px;
 	@extend %inline;
 }
 

@@ -1,7 +1,10 @@
+$switchHeight: $fieldHeight * 0.8125; //26
+$switchWidth: $fieldHeight * 1.5; //48
+
 .irform-switch {
 	position: relative;
-	width: 48px;
-	height: 26px;
+	width: #{$switchWidth}px;
+	height: #{$switchHeight}px;
 	margin: 3px 0;
 	background-color: transparent;
 	input[type=checkbox] {
@@ -22,25 +25,25 @@
 	label:before {
 		right: 1px;
 		background-color: $disableBgColor;
-		border-radius: 24px;
+		border-radius: #{$switchHeight - 2}px;
 		transition: background 0.4s;
 		@extend %border;
 	}
 	label:after {
-		width: 24px;
-		height: 24px;
-		border-radius: 24px;
-		background-color: $specialBgColor;
+		width: #{$switchHeight - 2}px;
+		height: #{$switchHeight - 2}px;
+		border-radius: #{$switchHeight - 2}px;
+		background-color: $fieldBgColor;
 		transition: margin 0.4s;
 		box-shadow: 0 2px 5px rgba(0,0,0,0.3);
 		@extend %border;
 		@extend %clickable;
 	}
 	input[type=checkbox]:checked + label:before {
-		background-color: $fieldBgColor;
+		background-color: $specialBgColor;
 	}
 	input[type=checkbox]:checked + label:after {
-		margin-left: 23px;
+		margin-left: #{$switchHeight - 3}px;
 	}
 	input[type=checkbox]:focus + label:before {
 		@extend %focus;

@@ -32,6 +32,12 @@ DISTDIR ?= dist
 INPUT ?= 
 OUTPUT ?= 
 MAKEFILE_ADDRESS := https://raw.githubusercontent.com/blaizard/Makefile/master/Makefile
+LEVEL?=0
+ifeq ($(LEVEL),0)
+TOPLEVEL:=1
+else
+TOPLEVEL:=
+endif
 
 # Commands
 PRINT_CMD ?= printf
@@ -107,9 +113,6 @@ define CONCAT
 @$(call MSG,CONCAT,GREEN,$2);
 $(AT)$(CONCAT_CMD) $(CONCAT_FLAGS) $1 > $2
 endef
-#define MKDIR
-#$(if $(shell test -d $1 && echo 1),,@$(call MSG,MKDIR,CYAN,$1);$(MKDIR_CMD) $(MKDIR_FLAGS) $1)
-#endef
 define MKDIR
 $(AT)[ -d $1 ] || $(call MSG,MKDIR,CYAN,$1); mkdir -p $1
 endef
@@ -138,7 +141,7 @@ endef
 
 # Make calls
 define MAKE_RUN
-$(MAKE) --no-print-directory $2 $1
+$(MAKE) --no-print-directory LEVEL=$$(( $(LEVEL) + 1 )) $2 $1
 endef
 define MAKE_NEXT
 $(if $(RULES),$(call MAKE_RUN, __$(firstword $(RULES)), RULES="$(wordlist 2, 10, $(RULES))" $1),:)
@@ -242,7 +245,7 @@ unexport RULES
 TIME_START:=$(shell date +%s%N)
 
 # Predefined rules
-all: $(BUILDDIR)/Makefile | $(ALL_RULES) mute-if-nop
+all: $(ALL_RULES) mute-if-nop
 	@printf "$(if $(COMPACT_MODE),$(CLEAR_LINE),)"
 	@$(foreach output, $(OUTPUT_LIST), $(call INFO, \
 		$(output): $(shell du -bh $(DISTDIR)/$(output) | awk '{print $$1 "B"}')) && ) true
@@ -317,9 +320,10 @@ check_pack:
 	$(call CHECK_TOOL, $(PACK_CMD), "")
 
 # Clean-up the created directoried
-clean: | mute-if-nop
+clean: mute-if-nop
 	$(call RMDIR,$(BUILDDIR)/)
 	$(call RMDIR,$(DISTDIR)/)
+	@printf "$(if $(and $(COMPACT_MODE), $(TOPLEVEL)),$(CLEAR_LINE),)"
 
 # Clean and re-build the targets
 rebuild:
@@ -327,7 +331,7 @@ rebuild:
 	+@$(call MAKE_RUN, build)
 
 # Re-build all what is inside the dist directory and make a package of it all
-release: check_pack | mute-if-nop
+release: check_pack mute-if-nop
 	$(call RMDIR,$(DISTDIR)/)
 	+@$(call MAKE_RUN, build)
 	$(call PACK,$(DISTDIR),$(DISTDIR)/$(PACKAGE))
@@ -336,28 +340,29 @@ release: check_pack | mute-if-nop
 # Automatically checks and update the Makefile with the latest version
 update:
 	$(call MKDIR, $(BUILDDIR)/)
-	$(call FETCH_UPDATE,$(BUILDDIR)/Makefile)
-	@cmp --silent Makefile $(BUILDDIR)/Makefile || ( \
+	$(call FETCH_UPDATE,$(BUILDDIR)/Makefile.new)
+	@cmp --silent Makefile $(BUILDDIR)/Makefile.new || ( \
 			$(call INFO,Makefile -> Makefile.old); \
 			cp Makefile Makefile.old; $(call INFO,Updating new Makefile); \
-			mv $(BUILDDIR)/Makefile Makefile )
+			mv $(BUILDDIR)/Makefile.new Makefile )
 	@$(call INFO,Makefile is up-to-date)
 
 # ---- Automatic targets -----------------------------------------------------
-process%:
+# These ar ethe target eferenced by ALL_RULES --------------------------------
+process%: $(BUILDDIR)/Makefile
 	$(call CHECK_DEFINED, INPUT)
 	$(call CHECK_FILE, $(INPUT))
 	$(call CHECK_DEFINED, OUTPUT)
 	+@$(call MAKE_NEXT, INPUT="$(INPUT)" OUTPUT="$(OUTPUT)")
 	@$(eval OUTPUT_LIST += "$(OUTPUT)")
 
-concat%:
+concat%: $(BUILDDIR)/Makefile
 	$(call CHECK_DEFINED, INPUT)
 	$(call CHECK_FILE, $(INPUT))
 	$(call CHECK_DEFINED, OUTPUT)
 	+@$(call MAKE_NEXT, INPUT="$(INPUT)" OUTPUT="$(OUTPUT)")
 
-copy%:
+copy%: $(BUILDDIR)/Makefile
 	$(call CHECK_DEFINED, INPUT)
 	$(call CHECK_FILE, $(INPUT))
 	+@$(foreach file, $(INPUT), $(call MAKE_NEXT, INPUT="$(file)" OUTPUT="$(OUTPUT)") && ) true
@@ -368,7 +373,7 @@ ifeq ($(call IS_RULE, __stamp),)
 ifeq ($(words $(OUTPUT)),1)
 # Note, the target ensures that only 1 output is specified
 ifeq ($(filter-out %.js %.css,$(OUTPUT)),)
-__stamp: | mute-if-nop
+__stamp: mute-if-nop
 	$(call CHECK_DEFINED, OUTPUT)
 	$(call CHECK_FILE, $(OUTPUT))
 	$(call STAMP,$(OUTPUT),/* $(STAMP_TXT) */)
@@ -388,7 +393,7 @@ endif
 # ---- Process ----------------------------------------------------------------
 ifeq ($(call IS_RULE, __process),)
 
-__process: $(DISTDIR)/$(OUTPUT) | mute-if-nop
+__process: $(DISTDIR)/$(OUTPUT) mute-if-nop
 
 # ---- Process - Javascript & CSS & SASS
 ifeq ($(filter-out %.js %.css %.scss %.sass,$(INPUT)),)
@@ -424,7 +429,7 @@ endif
 # ---- Concatenate ------------------------------------------------------------
 ifeq ($(call IS_RULE, __concat),)
 
-__concat: $(DISTDIR)/$(OUTPUT) | mute-if-nop
+__concat: $(DISTDIR)/$(OUTPUT) mute-if-nop
 # Contenate all files together
 $(DISTDIR)/$(OUTPUT): $(INPUT)
 	$(call MKDIR, `dirname "$(DISTDIR)/$(OUTPUT)"`/)
@@ -441,7 +446,7 @@ ifeq ($(words $(INPUT)),1)
 DIR_OUTPUT = $(DISTDIR)/$(if $(OUTPUT),$(OUTPUT)/,)$(notdir $(patsubst %/,%,$(abspath $(INPUT)))$(if $(wildcard $(INPUT)/.*),,/))$(if $(wildcard $(INPUT)/.*),/,)
 FILE_OUTPUT = $(DIR_OUTPUT)$(if $(wildcard $(INPUT)/.*),,$(notdir $(INPUT)))
 FILES_OUTPUT = $(patsubst %, $(DIR_OUTPUT)%, $(notdir $(shell find $(INPUT) -type f)))
-__copy: $(FILE_OUTPUT) | mute-if-nop
+__copy: $(FILE_OUTPUT) mute-if-nop
 $(FILE_OUTPUT):
 	$(call CHECK_DEFINED, INPUT)
 	$(call MKDIR, "$(DISTDIR)/$(OUTPUT)")

@@ -16,7 +16,7 @@ button.irform {
 	background-color: $specialBgColor;
 	color: $specialTextColor;
 	text-align: center;
-	min-width: 32px;
+	min-width: #{$fieldHeight}px;
 	padding: 0 8px;
 }
 

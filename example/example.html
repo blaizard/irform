@@ -15,21 +15,22 @@
 
 		<script src="../srcs/jquery.irform-modal.js"></script>
 
-		<link rel="stylesheet" type="text/css" href="../dist/css/irform.min.css"/>
+		<link rel="stylesheet" type="text/css" href="../dist/css/irform.touch.min.css"/>
 
 		<script src="tinymce/js/tinymce/tinymce.min.js"></script>
 		<script src="ircom/ircom.js"></script>
 	</head>
-	<body>
+	<body style="background-color: black; color: white;">
+	<!--
 		<h1>Password</h1>
 		<form id="myFormPassword" action="../handler/" method="post"></form>
 		<script type="text/javascript">
 		    var irform = new Irform("#myFormPassword", [
 		        {name: "username", caption: "Username", type: "input", required: true, validate: [Irform.EMAIL, Irform.CHAR_LOWERCASE_ONLY]},
 		        {name: "password", caption: "Password", type: "password", required: true},
-		        {name: "test", mask: "zzz(999) 999 9999", caption: "Test", type: "input", validate: [Irform.CHAR_A_Z | Irform.CHAR_0_9 | Irform.CHAR_DASH, function(value) {
-		        	return value.length > 4;	
-		        }]},
+		     //   {name: "test", mask: "zzz_999_9999999", caption: "Test", type: "input", validate: [Irform.CHAR_A_Z | Irform.CHAR_0_9 | Irform.CHAR_DASH, function(value) {
+		       // 	return value.length > 4;	
+		       // }]},
 		        {name: "new", caption: "New user?", type: "switch", onchange: {
 		            "selected": [
 		                {name: "repassword", caption: "Re-Enter Password", type: "password", required: true, validate: "password"},
@@ -37,6 +38,43 @@
 		        }},
 		        {type: "submit", value: "Ok"}
 		    ]);
+		</script>
+
+		<h1>Modal</h1>
+		<form>
+			<input type="text"  id="exampleModal" name="modalValue" value=""><br>
+		</form>
+		<script>
+			$("#exampleModal").click(function() {
+				var modal = $("<div>");
+				var form = new Irform(modal, [
+					{name: "test", caption: "Test", type: "input"},
+					{name: "test", caption: "Test", type: "input"},
+					{name: "test", caption: "Test", type: "input"},
+					{name: "test", caption: "Test", type: "input"},
+					{name: "test", caption: "Test", type: "input"},
+					{name: "test", caption: "Test", type: "input"},
+					{name: "test", caption: "Test", type: "input"},
+					{name: "test", caption: "Test", type: "input"},
+					{name: "test", caption: "Test", type: "input"},
+					{name: "test", caption: "Test", type: "input"},
+					{name: "test", caption: "Test", type: "input"},
+					{name: "test", caption: "Test", type: "input"},
+					{name: "test", caption: "Test", type: "input"},
+					{name: "test", caption: "Test", type: "input"},
+					{name: "test", caption: "Test", type: "input"},
+					{name: "test", caption: "Test", type: "input"},
+					{name: "test", caption: "Test", type: "input"},
+					{name: "test", caption: "Test", type: "input"},
+					{name: "test", caption: "Test", type: "input"},
+					{name: "test", caption: "Test", type: "input"}
+				]);
+				$(modal).irformModal({
+					onValidate: function() {
+						alert("hellow world");
+					}
+				});
+			});
 		</script>
 
 		<h1>Static form</h1>
@@ -72,6 +110,7 @@
 				});
 			}
 		</script>
+
 		<h1>Irform().create(...)</h1>
 		<form id="example2" action="hello" method="post"></form>
 		<button type="button" onclick="irformGet_example2()">Irform.get</button><br>
@@ -82,7 +121,9 @@
 
 
 			var formDescription = [
-				{name: "array", caption: "Array", type: "array"},
+				{name: "array", caption: "Array", type: "array", "template": [
+					{name: "checkbox", caption: "Checkbox", type: "checkbox", list: ["hello", "yes"], inline: true}
+				]},
 				{name: "test", caption: "Test", type: "input"},
 				{name: "checkbox", caption: "Checkbox", type: "checkbox", list: ["hello", "yes"], inline: true},
 				{name: "checkbox2", caption: "Checkbox", type: "checkbox", list: ["hello", "yes"]},
@@ -135,12 +176,13 @@
 			function irformSet_example2()
 			{
 				form.set({
-					keyword: "hello, world",
+					tags: "hello, world",
 					editor: "<b>hello</b> <i>world</i>!!!!",
 					switch: true,
-					checkbox: {
-						checkbox: true
-					}
+					array: [
+						{checkbox: {hello: "selected"}},
+						{checkbox: {yes: "selected"}}
+					]
 				});
 			}
 		</script>
@@ -150,6 +192,26 @@
 			{
 				Irform.clear("body");
 			}
+		</script>//-->
+
+
+		<h1>Nested array</h1>
+		<form id="example4"></form>
+		<script>
+			var formDescription = [
+				{name: "test", caption: "Text", type: "input"},
+				{name: "array1", caption: "Array", type: "array", "template": [
+					{name: "text", caption: "Text", type: "input"},
+					{name: "array2", caption: "Array", type: "array"}
+				]},
+			];
+			var form = new Irform("#example4", formDescription);
+			form.set({
+				test: "Prefill test",
+				array1: [
+					{text: "Hello", array2: []}
+				]
+			});
 		</script>
 	</body>
 </html>

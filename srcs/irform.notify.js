@@ -48,6 +48,14 @@ var Irnotify = function (message, options) {
 		$(entry).append(del);
 	}
 	$(containerNotify).append(entry);
+	this.entry = entry;
+};
+
+/**
+ * Delete the current notification
+ */
+Irnotify.prototype.delete = function() {
+	Irnotify.delete(this.entry);
 };
 
 /**
