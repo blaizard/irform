@@ -10,7 +10,7 @@
  */
 var Irform = function (container, formDescription, options) {
 	// Trigger require, to make sure that any pending modules are loaded
-	irRequire.trigger();
+	//irRequire.trigger();
 	this.container = $(container);
 	this.formDescription = formDescription;
 	this.options = $.extend(true, {}, Irform.defaultOptions, options);
@@ -185,15 +185,17 @@ Irform.defaultOptions = {
 	 */
 	wrapper: function(elt, options/*, name*/) {
 		var wrapper = $("<div>");
-		var div = $("<div>", {
-			class: "irform-caption"
-		});
-		$(div).text(options.caption);
+		if (typeof options.caption === "string") {
+			var div = $("<div>", {
+				class: "irform-caption"
+			});
+			$(div).text(options.caption);
+			$(wrapper).append(div);
+		}
 		var value = $("<div>", {
 			class: "irform-elements"
 		});
 		$(value).append(elt);
-		$(wrapper).append(div);
 		$(wrapper).append(value);
 		return wrapper;
 	},
@@ -405,8 +407,15 @@ Irform.prototype.create = function (container, formDescription) {
 		// Insert the wrapper
 		var item = this.options.wrapper.call(this, containerItem, itemOptions, itemName);
 		$(item).addClass("irform-item");
+		// Set the width
 		if (itemOptions.width) {
 			$(item).css("width", itemOptions.width);
+		}
+		// Set the alignment, it can be "left", "bottom", "top" and/or "right"
+		if (itemOptions.align) {
+			itemOptions.align.replace(/\s\s+/g, " ").toLowerCase().split(" ").map(function (name) {
+				$(item).addClass("irform-align-" + name.trim());
+			});
 		}
 		// Associate the name of the element with the element
 		$(item).attr("data-irform", itemName);
