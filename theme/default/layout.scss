@@ -1,0 +1,63 @@
+.irform-layout {
+	display: flex;
+	flex-wrap: wrap;
+	padding: 0;
+	margin: 0;
+}
+
+.irform-item {
+	width: 100%;
+	display: flex;
+	margin: 5px 0px;
+}
+
+.irform-layout.horizontal .irform-item {
+	min-width: 300px;
+	width: 50%;
+}
+
+.irform-caption {
+	text-align: right;
+	width: 150px;
+	white-space: normal;
+	flex-shrink: 0;
+	font-weight: bold;
+	padding-top: #{($fieldHeight - $fieldTextHeight) / 2}px;
+	@extend %multi-line;
+}
+
+.irform-elements {
+	padding-left: 10px;
+	width: 100%;
+}
+
+@media screen and (max-width: 768px) {
+	.irform-item {
+		flex-flow: column nowrap;
+		margin: 5px 0px;
+	}
+
+	.irform-caption {
+		text-align: left;
+		width: 100%;
+		margin-bottom: 5px;
+	}
+
+	.irform-elements {
+		padding-left: 0;
+	}
+}
+
+/* Alignment */
+.irform-align-top {
+	align-self: flex-start;
+}
+.irform-align-bottom {
+	align-self: flex-end;
+}
+.irform-align-left .irform-elements {
+	text-align: left;
+}
+.irform-align-right .irform-elements {
+	text-align: right;
+}

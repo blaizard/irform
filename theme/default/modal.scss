@@ -1,0 +1,33 @@
+.irform-modal {
+	background-color: rgba(0, 0, 0, 0.7);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.irform-modal-container {
+	background-color: $fieldBgColor;
+	color: $fieldTextColor;
+	max-width: 90%;
+	max-height: 90%;
+	min-width: 400px;
+	min-height: 200px;
+	overflow: auto;
+	border-radius: 5px;
+}
+
+.irform-modal-content {
+	padding: 30px;
+	max-height: 80%;
+	overflow: auto;
+}
+
+.irform-modal-control {
+	border: 0;
+	margin: 0;
+	padding: 0;
+	background-color: $fieldBgColor;
+	width: auto;
+	padding: 10px;
+	text-align: right;
+}

@@ -1,0 +1,66 @@
+$switchHeight: $fieldHeight * 0.8125; //26
+$switchWidth: $fieldHeight * 1.5; //48
+
+.irform-switch {
+	position: relative;
+	width: #{$switchWidth}px;
+	height: #{$switchHeight}px;
+	margin: 3px 0;
+	background-color: transparent;
+	input[type=checkbox] {
+		position: absolute;
+		top: -99999px;
+		left: -99999px;
+	}
+	label:before,
+	label:after {
+		display: block;
+		position: absolute;
+		top: 1px;
+		left: 1px;
+		bottom:	1px;
+		content: "";
+		cursor: pointer;
+	}
+	label:before {
+		right: 1px;
+		background-color: $disableBgColor;
+		border-radius: #{$switchHeight - 2}px;
+		transition: background 0.4s;
+		@extend %border;
+	}
+	label:after {
+		width: #{$switchHeight - 2}px;
+		height: #{$switchHeight - 2}px;
+		border-radius: #{$switchHeight - 2}px;
+		background-color: $fieldBgColor;
+		transition: margin 0.4s;
+		box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+		@extend %border;
+		@extend %clickable;
+	}
+	input[type=checkbox]:checked + label:before {
+		background-color: $specialBgColor;
+	}
+	input[type=checkbox]:checked + label:after {
+		margin-left: #{$switchHeight - 3}px;
+	}
+	input[type=checkbox]:focus + label:before {
+		@extend %focus;
+	}
+}
+
+// Disable specific
+.disable .irform-switch {
+	background-color: transparent;
+}
+.disable .irform-switch label:before,
+.disable .irform-switch label:after {
+	@extend %disable;
+}
+
+// Error specific
+.error .irform-switch label:before,
+.irform-switch.error label:before {
+	@extend %error-border;
+}

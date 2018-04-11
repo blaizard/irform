@@ -1,0 +1,32 @@
+textarea.irform {
+	@extend %multi-line;
+	@extend %border;
+	&:hover {
+		@extend %hover;
+	}
+	&:focus {
+		@extend %focus;
+	}
+	height: 82px;
+}
+
+// Error
+.error textarea.irform,
+textarea.irform.error {
+	@extend %error;
+	@extend %error-border;
+}
+
+// Success
+.success textarea.irform,
+textarea.irform.success {
+	@extend %success;
+	@extend %success-border;
+}
+
+// Disable
+.disable textarea.irform,
+textarea.irform:disabled,
+textarea.irform.disable {
+	@extend %disable;
+}

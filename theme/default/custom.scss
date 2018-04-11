@@ -1,0 +1,30 @@
+.irform-custom {
+	@extend %single-line;
+	@extend %border;
+	&:hover {
+		@extend %hover;
+	}
+	&:focus {
+		@extend %focus;
+	}
+}
+
+// Error
+.error .irform-custom,
+.irform-custom.error {
+	@extend %error;
+	@extend %error-border;
+}
+
+// Success
+.success .irform-custom,
+.irform-custom.success {
+	@extend %success;
+	@extend %success-border;
+}
+
+// Disable
+.disable .irform-custom,
+.irform-custom.disable {
+	@extend %disable;
+}
