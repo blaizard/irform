@@ -16,18 +16,23 @@
 .irform-array-item.inline {
 	margin-right: 5px;
 }
-.irform-array-item:hover {
-	.irform-array-item-up,
-	.irform-array-item-down,
-	.irform-array-item-del {
-		display: inline-block;
+
+// On mouse over
+.irform-array:not(.irform-array-drag) {
+	.irform-array-item:hover {
+		.irform-array-item-up,
+		.irform-array-item-down,
+		.irform-array-item-del {
+			display: inline-block;
+		}
+	}
+	.irform-array-item:hover:not(.inline) {
+		.irform-array-item-content {
+			margin-right: 5px;
+		}
 	}
 }
-.irform-array-item:hover:not(.inline) {
-	.irform-array-item-content {
-		margin-right: 5px;
-	}
-}
+
 .irform-array-item-up,
 .irform-array-item-down,
 .irform-array-item-del {
@@ -44,8 +49,33 @@
 	order: 4;
 }
 
+// Drag and drop
+.irform-array-drag {
+	cursor: pointer;
+}
+
+.irform-array-item-drag {
+	background-color: $fieldBgColor;
+	z-index: 99999;
+	position: absolute;
+	pointer-events: none;
+	touch-action: none;
+}
+
+.irform-array-placeholder {
+	vertical-align: top;
+}
+
 /* Tags specific */
 .irform-array-tags-tag .irform-array-item-del {
 	display: inline-block;
 	@extend %clickable-text;
+}
+
+/* Images specific */
+.irform-array-images img {
+	width: 150px;
+	height: 200px;
+	object-fit: contain;
+	display: block;
 }

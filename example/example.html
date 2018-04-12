@@ -1,5 +1,6 @@
 <html>
 	<head>
+		<meta charset="UTF-8">
 		<script src="jquery-3.1.0.min.js"></script>
 
 		<script src="irexplorer/irexplorer.min.js"></script>
@@ -9,19 +10,31 @@
 		<script src="../srcs/irform.notify.js"></script>
 		<script src="../srcs/jquery.irform-array.js"></script>
 		<script src="../srcs/jquery.irform-array.tags.js"></script>
+		<script src="../srcs/jquery.irform-array.images.js"></script>
 		<script src="../srcs/jquery.irform-tinymce.js"></script>
 		<script src="../srcs/jquery.irform-file.js"></script>
 		<script src="../srcs/irform.irexplorer.js"></script>
 
 		<script src="../srcs/jquery.irform-modal.js"></script>
 
-		<link rel="stylesheet" type="text/css" href="../dist/css/irform.touch.min.css"/>
+		<link rel="stylesheet" type="text/css" href="../dist/css/irform.min.css"/>
 
 		<script src="tinymce/js/tinymce/tinymce.min.js"></script>
 		<script src="ircom/ircom.js"></script>
 	</head>
-	<body style="background-color: black; color: white;">
-	<!--
+	<body style="background-color: white; color: black;">
+
+		<h1>Drag Images</h1>
+		<form id="dragImages"></form>
+		<script type="text/javascript">
+			var irform = new Irform("#dragImages", [
+				{name: "images", caption: "Images", type: "images"}
+			]);
+			irform.set({
+				images: ["img1.jpg", "img2.jpg", "img3.jpg"]
+			});
+		</script>
+
 		<h1>Password</h1>
 		<form id="myFormPassword" action="../handler/" method="post"></form>
 		<script type="text/javascript">
@@ -192,7 +205,7 @@
 			{
 				Irform.clear("body");
 			}
-		</script>//-->
+		</script>
 
 
 		<h1>Nested array</h1>

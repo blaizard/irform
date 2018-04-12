@@ -17,9 +17,7 @@
 	$.fn.irformArrayTags.defaults = {
 		template: "<span>" +
 						"<span class=\"irform-array-tags-edit\">" +
-							"<button class=\"irform-array-item-left irform dock-right\" type=\"button\"><span class=\"icon-arrow-left\"></span></button>" +
-							"<input type=\"text\" class=\"irform inline dock-left dock-right\" name=\"keyword\"/>" +
-							"<button class=\"irform-array-item-right irform dock-left\" type=\"button\"><span class=\"icon-arrow-right\"></span></button>" +
+							"<input type=\"text\" class=\"irform inline\" name=\"keyword\"/>" +
 						"</span>" +
 						"<span class=\"irform-array-tags-tag irform border inline clickable\" style=\"display: none;\">" +
 							"<span></span>" +
@@ -28,6 +26,8 @@
 					"</span>",
 		isMove: false,
 		isDelete: false,
+		isDrag: true,
+		dragHandleSelector: ".irform-array-item .irform-array-tags-tag > span:not(.irform-array-item-del)",
 		inline: true,
 		hookAdd: function(item) {
 			var obj = this;
@@ -63,12 +63,6 @@
 			});
 
 			// Allocate the various events
-			$(item).find(".irform-array-item-left").click(function() {
-				$().irformArray.moveItemUp.call(obj, item);
-			});
-			$(item).find(".irform-array-item-right").click(function() {
-				$().irformArray.moveItemDown.call(obj, item);
-			});
 			$(item).find(".irform-array-item-del").click(function() {
 				$().irformArray.deleteItem.call(obj, item);
 			});
@@ -80,27 +74,15 @@
 		 * Hook called once the element value is writen to it.
 		 */
 		hookValWrite: function(value) {
-			value = value.split(",");
-			var newVal = [];
-			for (var i in value) {
-				// Clean the value
-				var v = value[i].trim();
-				if (v) {
-					newVal.push({
-						keyword: v
-					});
-				}
-			}
-			return newVal;
+			return value.split(",").map(function(v) {
+				return {keyword: v.trim()};
+			});
 		},
 		/**
 		 * Hook called once the element value is read.
 		 */
 		hookValRead: function(value) {
-			for (var i in value) {
-				value[i] = value[i]["keyword"];
-			}
-			return value.join(", ");
+			return value.map(function(v) { return v.keyword; }).join(", ");
 		}
 	};
 })(jQuery);

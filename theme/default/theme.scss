@@ -62,7 +62,7 @@
 
 %single-line {
 	line-height: #{$fieldHeight}px;
-	height: #{$fieldHeight}px;
+	min-height: #{$fieldHeight}px;
 }
 
 %multi-line {

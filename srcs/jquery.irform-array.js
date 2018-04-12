@@ -106,6 +106,30 @@
 		}
 	}
 
+	// Drag specific
+	var dragObject = null;
+
+	// Attach event when element is dropped
+	$(document).on("mouseup touchend", function(e) {
+		if (dragObject) {
+			e.stopPropagation();
+
+			// Remove decoration classes
+			$(dragObject.item).removeClass("irform-array-item-drag");
+			$(dragObject.obj).addClass("irform-array-drag");
+
+			// Move the element
+			if ($(dragObject.placeholder).parents('html').length) {
+				$(dragObject.item).detach();
+				$(dragObject.placeholder).before(dragObject.item);
+			}
+			$(dragObject.placeholder).remove();
+
+			// Disable dragging
+			dragObject = false;
+		}
+	});
+
 	/**
 	 * Add a new item
 	 */
@@ -204,6 +228,94 @@
 		});
 		$(obj).append(content);
 
+		// Enable dragging onliny within the boundaries of the array
+		if (options.isDrag) {
+
+			// Helpers
+			var getCoordinates = function(e) {
+				if (e.originalEvent.touches && e.originalEvent.touches.length) {
+					return {x: e.originalEvent.touches[0].pageX, y: e.originalEvent.touches[0].pageY};
+				}
+				return {x: e.pageX, y: e.pageY};
+			};
+
+			$(content).on("mousemove touchmove", function(e) {
+				if (dragObject) {
+					var cursor = getCoordinates(e);
+
+					if (dragObject.init) {
+
+						// Create a placeholder element
+						$(dragObject.placeholder).html("&nbsp;");
+						$(dragObject.item).before(dragObject.placeholder);
+						$(dragObject.item).addClass("irform-array-item-drag");
+						$(obj).addClass("irform-array-drag");
+
+						// Stop init
+						dragObject.init = false;
+					}
+
+					// Move the item
+					$(dragObject.item).css({
+						left: cursor.x + dragObject.offsetX,
+						top: cursor.y + dragObject.offsetY
+					});
+
+					// Change the placeholder
+					{
+						var eltList = document.elementsFromPoint(cursor.x - $(document).scrollLeft(), cursor.y - $(document).scrollTop());
+						var i = eltList.indexOf(content.get(0));
+						// The following element in the list must be the item
+						if (i > 0 && eltList[i - 1].classList.contains("irform-array-item")) {
+							// If this is not the placeholder
+							if (!eltList[i - 1].classList.contains("irform-array-placeholder")) {
+								// Detach the element from the DOM to reajust the DOM
+								$(dragObject.placeholder).detach();
+
+								// Look for the element where to insert the next placeholder
+								var curItem = eltList[i - 1];
+								do {
+									if ($(curItem).offset().left <= cursor.x && $(curItem).offset().top <= cursor.y
+											&& $(curItem).offset().left + $(curItem).outerWidth(true) >= cursor.x
+											&& $(curItem).offset().top + $(curItem).outerHeight(true) >= cursor.y) {
+										$(curItem).before(dragObject.placeholder);
+										break;
+									}
+									curItem = $(curItem).next();
+								} while ($(curItem).length);
+
+								// Insert at the end if no position was identified
+								if (!$(curItem).length) {
+									$(obj).find(".irform-array-item:last").after(dragObject.placeholder);
+								}
+
+							}
+						}
+					}
+				}
+			});
+
+			$(content).on("mousedown touchstart", options.dragHandleSelector, function(e) {
+				e.stopPropagation();
+				e.preventDefault();
+
+				var cursor = getCoordinates(e);
+				var item = $(this).closest(".irform-array-item");
+
+				dragObject = {
+					init: true,
+					obj: obj,
+					item: item,
+					offsetX: $(item).offset().left - cursor.x,
+					offsetY: $(item).offset().top - cursor.y,
+					placeholder: $("<div/>", {
+						class: "irform-array-placeholder "  + $(item).attr("class"),
+						style: "width: " + $(item).width() + "px; height: " + $(item).height() + "px; " + $(item).attr("style")
+					})
+				};
+			});
+		}
+
 		// Set an event to add new items
 		$(obj).on("array-add", function(e) {
 			e.stopPropagation();
@@ -266,6 +378,14 @@
 		 */
 		isMove: true,
 		/**
+		 * If the drag functionality to move items should be implemented
+		 */
+		isDrag: false,
+		/**
+		 * Select used to select the drag handle
+		 */
+		dragHandleSelector: ".irform-array-item",
+		/**
 		 * HTML to be used for the delete button
 		 */
 		delete: "<button class=\"irform dock-left\" type=\"button\"><span class=\"icon-cross\"></span></button>",
@@ -299,6 +419,7 @@
 			return value;
 		}
 	};
+
 })(jQuery);
 
 // Hook to the jQuery.fn.val function

@@ -81,7 +81,8 @@
 		/* Create the input field */
 		var input = $("<input>", {
 			name: options.name,
-			class: "irform"
+			class: "irform",
+			style: (options.showInput) ? "" : "display: none;"
 		});
 		$(container).append(input);
 		/* Add the button(s) */
@@ -134,6 +135,10 @@
 		 * Overwrite the type of file supported, a string supporting regexpr format.
 		 */
 		fileType: null,
+		/**
+		 * If the input field should be displayed or not
+		 */
+		showInput: true,
 		/**
 		 * List of presets
 		 */
