@@ -14,6 +14,7 @@
 		<script src="../srcs/jquery.irform-tinymce.js"></script>
 		<script src="../srcs/jquery.irform-file.js"></script>
 		<script src="../srcs/irform.irexplorer.js"></script>
+		<script src="../srcs/jquery.irform-dropdown.js"></script>
 
 		<script src="../srcs/jquery.irform-modal.js"></script>
 
@@ -23,6 +24,14 @@
 		<script src="ircom/ircom.js"></script>
 	</head>
 	<body style="background-color: white; color: black;">
+
+		<h1>Drop down</h1>
+		<form id="dropDown"></form>
+		<script type="text/javascript">
+			var irform = new Irform("#dropDown", [
+				{name: "dropdown", caption: "Dropdown", type: "dropdown"}
+			]);
+		</script>
 
 		<h1>Drag Images</h1>
 		<form id="dragImages"></form>

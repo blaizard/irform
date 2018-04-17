@@ -5,8 +5,6 @@
 	font-size: #{$fieldTextHeight}px;
 	line-height: #{$fieldTextHeight}px;
 	margin: 0px;
-	padding: 0px;
-	white-space: nowrap;
 	box-sizing: border-box;
 	width: 100%;
 	vertical-align: middle;
@@ -25,9 +23,9 @@
 	display: flex;
 	width: 100%;
 }
-.irform-group > input ~ button,
-.irform-group > button ~ input,
-.irform-group > button ~ button,
+.irform-group > input + button,
+.irform-group > button + input,
+.irform-group > button + button,
 .irform.dock-left {
 	border-left: 0;	
 	border-bottom-left-radius: 0;
@@ -160,6 +158,7 @@
 @import "button.scss";
 @import "array.scss";
 @import "checkbox.scss";
+@import "dropdown.scss";
 @import "switch.scss";
 @import "notify.scss";
 @import "modal.scss";

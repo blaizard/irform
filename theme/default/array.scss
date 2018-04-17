@@ -15,6 +15,7 @@
 }
 .irform-array-item.inline {
 	margin-right: 5px;
+	margin-bottom: 5px;
 }
 
 // On mouse over
@@ -55,9 +56,8 @@
 }
 
 .irform-array-item-drag {
-	background-color: $fieldBgColor;
 	z-index: 99999;
-	position: absolute;
+	position: fixed;
 	pointer-events: none;
 	touch-action: none;
 }
@@ -67,15 +67,39 @@
 }
 
 /* Tags specific */
-.irform-array-tags-tag .irform-array-item-del {
-	display: inline-block;
-	@extend %clickable-text;
+.irform-array-tags-tag {
+	background-color: $fieldBgColor;
+
+	.irform-array-item-del {
+		display: inline-block;
+		@extend %clickable-text;
+	}
 }
 
 /* Images specific */
-.irform-array-images img {
-	width: 150px;
-	height: 200px;
-	object-fit: contain;
-	display: block;
+.irform-array-images {
+	background-color: $fieldBgColor;
+	display: inline-block;
+	border: $fieldBorderThickness solid $fieldBorderColor;
+	border-radius: $fieldBorderRadius;
+	padding: 5px;
+
+	img {
+		width: 150px;
+		height: 200px;
+		object-fit: contain;
+		display: block;
+		margin-top: -1em;
+	}
+
+	.irform-array-images-del {
+		position: relative;
+		left: calc(100% - 1em);
+		opacity: 0.5;
+		cursor: pointer;
+
+		&:hover {
+			opacity: 1;
+		}
+	}
 }

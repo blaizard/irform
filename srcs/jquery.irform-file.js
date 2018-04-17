@@ -68,7 +68,6 @@
 		};
 	};
 
-
 	$.fn.irformFile.create = function() {
 		/* Read the options */
 		var options = $(this).data("irformFile");
@@ -85,9 +84,13 @@
 			style: (options.showInput) ? "" : "display: none;"
 		});
 		$(container).append(input);
+		if (!options.showInput) {
+			$(container).append($("<span/>"));
+		}
 		/* Add the button(s) */
 		for (var i in options.buttonList) {
-			var preset = options.presets[options.buttonList[i]];
+			var presetName = options.buttonList[i];
+			var preset = options.presets[presetName];
 			var button = $("<button>", {
 				class: "irform",
 				type: "button"
@@ -96,6 +99,9 @@
 			$(button).data("irformFile", preset);
 			$(button).click(function() {
 				var callback = function(value) {
+					if (value) {
+						options.hookSelect.call(obj, presetName, value);
+					}
 					$(input).val(value);
 				};
 				var options = $(obj).data("irformFile");
@@ -140,6 +146,10 @@
 		 */
 		showInput: true,
 		/**
+		 * Callback once a value has been selected
+		 */
+		hookSelect: function(preset, value) {},
+		/**
 		 * List of presets
 		 */
 		presets: {
@@ -162,6 +172,9 @@
 						}
 						callback(name);
 					});
+					$(file).on("click", function(e) {
+						e.stopPropagation();
+					});
 					$(file).hide();
 					$(this).append(file);
 					$(file).trigger("click");
@@ -175,7 +188,6 @@
 			}
 		}
 	};
-
 })(jQuery);
 
 /* Add the module to Irform */

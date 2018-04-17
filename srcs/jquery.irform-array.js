@@ -130,11 +130,19 @@
 		}
 	});
 
+	// Helpers
+	var getCoordinates = function(e) {
+		if (e.originalEvent.touches && e.originalEvent.touches.length) {
+			return {x: e.originalEvent.touches[0].pageX, y: e.originalEvent.touches[0].pageY};
+		}
+		return {x: e.pageX, y: e.pageY};
+	};
+
 	/**
 	 * Add a new item
 	 */
 	$.fn.irformArray.add = function() {
-		// The instanc eof the current object
+		// The instance of the current object
 		var obj = this;
 		// Read the options
 		var options = $(this).data("irformArray");
@@ -306,8 +314,8 @@
 					init: true,
 					obj: obj,
 					item: item,
-					offsetX: $(item).offset().left - cursor.x,
-					offsetY: $(item).offset().top - cursor.y,
+					offsetX: $(item).offset().left - cursor.x - $(document).scrollLeft(),
+					offsetY: $(item).offset().top - cursor.y - $(document).scrollTop(),
 					placeholder: $("<div/>", {
 						class: "irform-array-placeholder "  + $(item).attr("class"),
 						style: "width: " + $(item).width() + "px; height: " + $(item).height() + "px; " + $(item).attr("style")
@@ -343,6 +351,15 @@
 				$(obj).trigger("array-add");
 			});
 			$(obj).append(add);
+		}
+
+		// Set the custom element
+		if (options.custom) {
+			var custom = $("<div>", {
+				style: "display:inline-block;"
+			});
+			$(custom).html(options.custom);
+			$(obj).append(custom);
 		}
 	}
 
@@ -401,6 +418,10 @@
 		 * HTML to be used for the down button
 		 */
 		down: "<button class=\"irform dock-left dock-right\" type=\"button\"><span class=\"icon-arrow-down\"></span></button>",
+		/**
+		 * HTML to be used for the custom element (no action is binded to it)
+		 */
+		custom: null,
 		/**
 		 * Hook called once an item has been added
 		 * \param item

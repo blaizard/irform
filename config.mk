@@ -4,6 +4,8 @@ BASE_SRCS := \
 	srcs/irform.notify.js \
 	srcs/jquery.irform-array.js \
 	srcs/jquery.irform-array.tags.js \
+	srcs/jquery.irform-array.images.js \
+	srcs/jquery.irform-dropdown.js \
 	srcs/jquery.irform-custom.js \
 	srcs/jquery.irform-tinymce.js \
 	srcs/jquery.irform-file.js \

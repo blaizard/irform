@@ -1,0 +1,88 @@
+// Error
+.error .irform-dropdown-input {
+	@extend %error;
+	@extend %error-border;
+}
+
+// Success
+.success .irform-dropdown-input {
+	@extend %success;
+	@extend %success-border;
+}
+
+// Disable
+.disable .irform-dropdown-input {
+	@extend %disable;
+}
+
+.irform-dropdown {
+	position: relative;
+	display: inline-block;
+	width: 100%;
+
+	&:hover {
+		.irform-dropdown-input,
+		.irform-dropdown-select {
+			@extend %hover;
+		}
+	}
+
+	.irform-dropdown-input,
+	.irform-dropdown-select {
+		@extend %single-line;
+		@extend %border;
+
+		&:focus {
+			@extend %focus;
+		}
+
+		width: 100%;
+		white-space: nowrap;
+		overflow: hidden;
+
+		/* Avoid any new line */
+		br {
+			display: none;
+		}
+		* {
+			display: inline;
+			white-space: nowrap;
+		}
+	}
+
+	/* Select specific style */
+	.irform-dropdown-select {
+		cursor: pointer;
+
+		&:after {
+			position: absolute;
+			content: "";
+			top: 14px;
+			right: 10px;
+			width: 0;
+			height: 0;
+			border: 6px solid transparent;
+			border-color: $fieldTextColor transparent transparent transparent;
+		}
+	}
+
+	.irform-dropdown-menu {
+		position: absolute;
+		background-color: $fieldBgColor;
+		box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+		z-index: 1;
+		width: 100%;
+
+		.irform-dropdown-item {
+			padding: 0px 6px;
+			@extend %single-line;
+
+			&:hover {
+				background-color: $specialBgColor;
+				color: $specialTextColor;
+				cursor: pointer;
+			}
+		}
+	}
+}
+

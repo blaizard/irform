@@ -5,10 +5,15 @@
 	 * \alias jQuery.irformArrayImages
 	 */
 	$.fn.irformArrayImages = function(options) {
-		var add = $("<div/>");
-		new Irform(add, [{name: "upload", type: "file", options: {showInput: false}}]);
+		var obj = this;
 		$(this).irformArray($.extend(true, $.fn.irformArrayImages.defaults, {
-			add: add
+			custom: $("<div/>").irformFile({
+				showInput: false,
+				hookSelect: function(preset, value) {
+					$(obj).trigger("array-add");
+					console.log(preset, value);
+				}
+			})
 		}, options));
 	};
 
@@ -20,23 +25,22 @@
 	 */
 	$.fn.irformArrayImages.defaults = {
 		template: "<span class=\"irform-array-images irform\">" +
-						"<img />" +
-					//	"<span class=\"irform-array-images-del\"><span class=\"icon-cross\"></span></span>" +
-						"<input name=\"img\" style=\"display: none;\" />" +
-					"</span>",
+					"<span class=\"irform-array-images-del\"><span class=\"icon-cross\"></span></span>" +
+					"<img />" +
+					"<input name=\"img\" style=\"display: none;\" />" +
+				"</span>",
 		isMove: false,
-		isDelete: true,
-		delete: "<span class=\"irform-array-images-del\"><span class=\"icon-cross\">X</span></span>",
+		isDelete: false,
+		isAdd: false,
 		isDrag: true,
 		dragHandleSelector: ".irform-array-item img",
 		inline: true,
 		hookAdd: function(item) {
 			var obj = this;
 
-			var tag = $(item).find(".irform-array-tags-tag");
 			$(item).find("input").on("blur", function() {
 				var value = $(this).val();
-				// Show and update the tag
+				// Update the source of the image
 				$(item).find("img").attr("src", value);
 			}).on("change", function() {
 				$(this).trigger("blur");
