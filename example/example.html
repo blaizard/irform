@@ -29,7 +29,9 @@
 		<form id="dropDown"></form>
 		<script type="text/javascript">
 			var irform = new Irform("#dropDown", [
-				{name: "dropdown", caption: "Dropdown", type: "dropdown"}
+				{name: "dropdown", caption: "Dropdown", type: "dropdown", options: {selectMode: true}, width: "50%"},
+				{name: "dropdown", caption: "Dropdown", type: "dropdown", options: {selectMode: false}, width: "50%"},
+				{name: "dropdown", caption: "Dropdown", type: "select", width: "50%"},
 			]);
 		</script>
 
