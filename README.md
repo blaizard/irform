@@ -6,7 +6,8 @@ All the basic fields are already supported (input, textarea, select...), more ad
 
 This library can also be easily adapted to support any UI. Bootstrap is currently supported but any other can be easily implemented.
 
-&#128279; https://www.blaizard.com/projects/irform
+&#128279; [https://blaizard.github.io/irform](https://blaizard.github.io/irform)
+
 
 ## Features
 
@@ -23,12 +24,6 @@ This library can also be easily adapted to support any UI. Bootstrap is currentl
   * Switches
   * WYSIWYG (HTML Editor)
   * Arrays [(2)](#arrays)
-
-## &#10003; Try the [examples](https://www.blaizard.com/projects/irform/examples)
-
-## &#10003; Go through the [getting started](https://www.blaizard.com/projects/irform/getting-started)
-
-## &#10003; Read the [documentation](https://www.blaizard.com/projects/irform/documentation)
 
 <a name="extensible">(1)</a> Can add new fields.<br/>
 <a name="arrays">(2)</a> Arrays are modular elements that can contain multiple occurence of similar sub-elements (configurable through templates). See the documentation for more information.<br/>
