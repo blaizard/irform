@@ -80,7 +80,7 @@
 .irform-array-images {
 	background-color: $fieldBgColor;
 	display: inline-block;
-	border: $fieldBorderThickness solid $fieldBorderColor;
+	border: $fieldBorderThickness solid rgba(0, 0, 0, 0.1);
 	border-radius: $fieldBorderRadius;
 	padding: 5px;
 

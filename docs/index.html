@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Documentation</title>
+		<meta name="description" content="Documentation"/>
+		<meta charset="utf-8"/>
+
+		<link href="doc-internal/style.css" rel="stylesheet" type="text/css">
+		<script type="text/javascript" src="doc-internal/irrequire.min.js"></script>
+		<script type="text/javascript" src="doc-internal/utils.js"></script>
+		<script type="text/javascript" src="dist/irajax.min.js"></script>
+	</head>
+	<body>
+		<div class="doc-wrap">
+			<div class="doc-menu">
+				<h1 id="doc-title"></h1>
+				<ul id="doc-menu"></ul>
+				<div id="doc-github"></div>
+				<div id="doc-download"></div>
+			</div>
+			<div class="doc-content"><div id="doc-body"></div></div>
+		</div>
+
+		<script type="text/javascript">
+			docInternalLoadJson("doc.json", function(data) {
+				docCtx = new DocContext(data);
+				docCtx.initialize();
+			});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,21 @@
+<h2>Controls</h2>
+<p>Display all available controls.</p>
+<div id="form-controls"></div>
+<script>
+	irRequire("Irform").then(() => {
+		new Irform("#form-controls", [
+				{name: "input", caption: "Input", type: "input"},
+				{name: "checkbox", caption: "Checkbox", type: "checkbox", list: ["choice 1", "choice 2", "choice 3"]},
+				{name: "switch", caption: "Switch", type: "switch"},
+				{name: "password", caption: "Password", type: "password"},
+				{name: "textarea", caption: "Textarea", type: "textarea"},
+				{name: "select", caption: "Select", type: "select", list: ["choice 1", "choice 2", "choice 3"]},
+				{name: "dropdown", caption: "Dropdown", type: "dropdown", list: ["choice 1", "choice 2", "choice 3"]},
+				{name: "array", caption: "Array", type: "array"},
+				{name: "tags", caption: "Tags", type: "tags"},
+				{name: "images", caption: "Images", type: "images"},
+				{name: "file", caption: "File", type: "file"},
+				{name: "submit", caption: "Submit", type: "submit"},
+			]);
+	});
+</script>

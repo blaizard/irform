@@ -550,7 +550,6 @@ Irform.prototype.findNameHolder = function (name) {
 	return Irform.findNameHolder(this.container, name);
 };
 
-
 /**
  * Disable all elements of the form
  */

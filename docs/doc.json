@@ -1,0 +1,14 @@
+{
+	"irRequire": {
+		"jQuery": "https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js",
+		"Irform": ["jQuery", "dist/js/irform.min.js", "dist/css/irform.min.css"]
+	},
+	"pages" : [
+		["Description", "readme"],
+		["Examples", "code", ["examples/controls.html", "examples/modal.html", "examples/autocomplete.html"]],
+		["License", "license"]
+	],
+	"title": "irform",
+	"github": ["blaizard", "irform"],
+	"download": []
+}

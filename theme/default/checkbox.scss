@@ -30,7 +30,7 @@ input.irform[type=checkbox] {
 		content: "\2713";
 		font-size: #{$fieldTextHeight * 1.2}px;
 		font-weight: bold;
-		line-height: #{$fieldHeight * 1.2}px;
+		line-height: #{$fieldHeight}px;
 		color: $fieldTextColor;
 		position: absolute;
 		top: 0;

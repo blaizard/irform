@@ -68,6 +68,11 @@
 		};
 	};
 
+	// Globally hide the menu when clicked somewhere
+	$(document).on("mousedown touchstart", function() {
+		$(".irform-dropdown-menu").hide();
+	});
+
 	$.fn.irformDropdown.create = function() {
 		// Read the options
 		var options = $(this).data("irformDropdown");
@@ -86,6 +91,7 @@
 			style: "display: none;"
 		});
 		$(container).append(inputValue);
+
 		// Create the input field
 		var input = $("<div>", {
 			contenteditable: options.editable,
@@ -93,10 +99,7 @@
 		});
 		$(container).append(input);
 
-		$(input).on("blur keyup paste copy cut mouseup change", function() {
-			$(inputValue).val($(this).text());
-		});
-
+		// Create the menu itself
 		var menu = $("<div>", {
 			class: "irform-dropdown-menu"
 		});
@@ -105,24 +108,25 @@
 			$(input).text($(this).text()).trigger("change");
 			$(menu).hide();
 		});
+		$(menu).on("mousedown touchstart", function(e) {
+			e.stopPropagation();
+		});
 		$(container).append(menu);
 
 		// Add input onclick event to show the menu
 		if (options.selectMode) {
-			$(input).on("click", function() {
-				$(menu).empty().show();
-				$(obj).data("irformDropdown-list").forEach(function(data) {
-					var item = $("<div>", {
-						class: "irform-dropdown-item"
-					});
-					item.text(data[0]);
-					$(menu).append(item);
-				});
+			$(input).on("click", function(e) {
+				$(this).trigger("input", true);
 			});
 		}
 
+		// Update the value when the input change
+		$(input).on("blur keyup paste copy cut mouseup change", function() {
+			$(inputValue).val($(this).text());
+		});
+
 		// Add events
-		$(input).on("input", function() {
+		$(input).on("input", function(e, isClick) {
 
 			var value = $(this).text();
 			var ret = options.updateList.call(this, value);
@@ -136,7 +140,7 @@
 				var matchList = [];
 				var filter = value.toLowerCase();
 				$(obj).data("irformDropdown-list").forEach(function(data) {
-					var weight = $.fn.irformDropdown.search(filter, data[1], options.minWeight);
+					var weight = (isClick) ? 1 : $.fn.irformDropdown.search(filter, data[1], options.minWeight);
 					if (weight > 0) {
 						matchList.push([weight, data[0]]);
 					}
@@ -158,7 +162,7 @@
 			};
 
 			// Either process the promise or directly the result
-			(ret instanceof Promise) ? ret.then(action) : action(ret);
+			(ret instanceof Promise) ? ret.then(action).catch(console.error) : action(ret);
 		});
 
 		$(this).append(container);
@@ -232,14 +236,7 @@
 		maxResults: 10,
 		selectMode: true,
 		updateList: function(value) {},
-		list: [
-			"Hello",
-			"World",
-			"Orange",
-			"Apple",
-			"Pear",
-			"Datatatata"
-		]
+		list: []
 	};
 
 })(jQuery);
@@ -247,7 +244,7 @@
 /* Add the module to Irform */
 Irform.defaultOptions.fields.dropdown = function(name, options) {
 	var div = $("<div>");
-	var o = {name: name};
+	var o = {name: name, list: options.list};
 	if (typeof options["options"] === "object") {
 		o = $.extend(true, o, options["options"]);
 	}

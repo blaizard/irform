@@ -1,0 +1,20 @@
+<h2>Modal</h2>
+<p>Show functionality of the modal window.</p>
+<button id="modal">Simple</button>
+<button id="modal-noclickoutside">Disable Clicks Outside</button>
+<button id="modal-onvalidate">Validate</button>
+<script>
+	function setupModal(selector, config) {
+		irRequire("jQuery").then(() => {
+			$(selector).click(() => {
+				irRequire("Irform").then(() => {
+					$("<span>Hello World!</span>").irformModal(config);
+				});
+			});
+		});
+	}
+
+	setupModal("#modal");
+	setupModal("#modal-noclickoutside", {closeOnClickOutside: false, isCancel: true});
+	setupModal("#modal-onvalidate", {isCancel: true, onValidate: () => { alert("Validate!"); }});
+</script>

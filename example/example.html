@@ -29,9 +29,25 @@
 		<form id="dropDown"></form>
 		<script type="text/javascript">
 			var irform = new Irform("#dropDown", [
-				{name: "dropdown", caption: "Dropdown", type: "dropdown", options: {selectMode: true}, width: "50%"},
-				{name: "dropdown", caption: "Dropdown", type: "dropdown", options: {selectMode: false}, width: "50%"},
-				{name: "dropdown", caption: "Dropdown", type: "select", width: "50%"},
+				{name: "dropdown", caption: "Dropdown", type: "dropdown", list: ["hello", "world"], options: {selectMode: true}, width: "50%"},
+				{name: "dropdown", caption: "Dropdown", type: "dropdown", list: ["hello", "world"], options: {selectMode: false}, width: "50%"},
+				{name: "dropdown", caption: "Dropdown", type: "dropdown", list: ["hello", "world"], options: {editable: false}, width: "50%"},
+				{name: "dropdown", caption: "Dropdown", type: "dropdown", options: {
+					selectMode: false,
+					updateList: function(value) {
+						return new Promise((resolve, reject) => {
+							$.ajax("http://gd.geobytes.com/AutoCompleteCity?q=" + encodeURIComponent(value),{dataType: "jsonp"})
+							.done((data) => {
+									if (data.length && data[0] && data[0] != "%s") {
+										resolve(data);
+									}
+							})
+							.fail(() => {
+								reject("Error");
+							});
+						});
+					}
+				}, width: "50%"},
 			]);
 		</script>
 
@@ -42,7 +58,7 @@
 				{name: "images", caption: "Images", type: "images"}
 			]);
 			irform.set({
-				images: ["img1.jpg", "img2.jpg", "img3.jpg"]
+			/*	images: ["img1.jpg", "img2.jpg", "img3.jpg"]*/
 			});
 		</script>
 
@@ -151,6 +167,7 @@
 				{name: "test", caption: "Test", type: "input"},
 				{name: "checkbox", caption: "Checkbox", type: "checkbox", list: ["hello", "yes"], inline: true},
 				{name: "checkbox2", caption: "Checkbox", type: "checkbox", list: ["hello", "yes"]},
+				{name: "checkbox3", caption: "Checkbox", type: "dropdown", list: ["hello", "yes"]},
 				{name: "switch", caption: "Switch", type: "switch"},
 				{name: "tags", caption: "Tags", disabled: false, type: "tags"},
 				{name: "file", caption: "File", type: "file"},
@@ -229,8 +246,8 @@
 					{name: "array2", caption: "Array", type: "array"}
 				]},
 			];
-			var form = new Irform("#example4", formDescription);
-			form.set({
+			var form2 = new Irform("#example4", formDescription);
+			form2.set({
 				test: "Prefill test",
 				array1: [
 					{text: "Hello", array2: []}

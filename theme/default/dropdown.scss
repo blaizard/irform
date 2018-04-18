@@ -58,8 +58,8 @@
 		&:after {
 			position: absolute;
 			content: "";
-			top: 14px;
-			right: 10px;
+			top: #{$fieldHeight / 2 - 2}px;
+			right: #{$fieldHeight / 2 - 6}px;
 			width: 0;
 			height: 0;
 			border: 6px solid transparent;
@@ -73,10 +73,13 @@
 		box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
 		z-index: 1;
 		width: 100%;
+		user-select: none;
 
 		.irform-dropdown-item {
 			padding: 0px 6px;
 			@extend %single-line;
+			overflow: hidden;
+			white-space: nowrap;
 
 			&:hover {
 				background-color: $specialBgColor;
