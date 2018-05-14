@@ -1,0 +1,57 @@
+@import "../default/config.scss";
+
+/* Update the configuration here */
+
+$fieldTextColor: #3498db;
+$specialTextColor: #fff;
+$specialBgColor: #3498db;
+
+$successTextColor: #000;
+$successBorderColor: #aaa;
+
+@mixin hover {
+	border-bottom-color: transparent;
+	box-shadow: 0 2px 0 #3498db;
+}
+
+@mixin focus {
+	@include hover;
+}
+
+@import "../default/theme.scss";
+
+/* Update the style here */
+
+
+// ---- Change the style of the borders ----
+
+.irform.border,
+.mce-tinymce,
+.irform-dropdown .irform-dropdown-input,
+.irform-dropdown .irform-dropdown-select,
+input.irform[type=checkbox] + label:before,
+button.irform,
+select.irform,
+textarea.irform,
+.irform-custom,
+input.irform {
+	border-radius: 0px;
+}
+
+.irform.border,
+.irform-dropdown .irform-dropdown-input,
+.irform-dropdown .irform-dropdown-select,
+input.irform[type=checkbox] + label:before,
+button.irform,
+select.irform,
+.irform-custom,
+input.irform {
+	border: 0px solid #fff;
+	border-bottom: 1px solid #aaa;
+}
+
+// ---- Change the style of the focus ----
+
+.irform-dropdown .irform-dropdown-menu {
+	margin-top: 3px;
+}

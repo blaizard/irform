@@ -40,6 +40,7 @@
 		white-space: nowrap;
 		overflow: hidden;
 		padding: 0px 6px;
+		min-width: 32px;
 
 		/* Avoid any new line */
 		br {
@@ -74,6 +75,7 @@
 		z-index: 1;
 		width: 100%;
 		user-select: none;
+		margin-top: 1px;
 
 		.irform-dropdown-item {
 			padding: 0px 6px;

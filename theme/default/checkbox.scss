@@ -1,9 +1,8 @@
 $switchSize: $fieldHeight * 0.6875; //22
 
 input.irform[type=checkbox] {
-	position: absolute;
-	top: -99999px;
-	left: -99999px;
+	display: none;
+
 	+ label {
 		position: relative;
 		padding-left: #{$fieldHeight - 2}px;

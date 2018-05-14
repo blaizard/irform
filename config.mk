@@ -33,41 +33,11 @@ process-stamp_maincss: INPUT := \
 	theme/default/icon.css \
 	theme/default/main.scss
 
-# irform.black.min.css
-process-stamp_mainblackcss: OUTPUT := ../docs/dist/css/irform.black.min.css
-process-stamp_mainblackcss: INPUT := \
+# irform.pure.min.css
+process-stamp_purecss: OUTPUT := ../docs/dist/css/irform.pure.min.css
+process-stamp_purecss: INPUT := \
 	theme/default/icon.css \
-	theme/black/main.scss
-
-# irform.aube.min.css
-process-stamp_maintouchcss: OUTPUT := ../docs/dist/css/irform.touch.min.css
-process-stamp_maintouchcss: INPUT := \
-	theme/default/icon.css \
-	theme/touch/main.scss
-
-# Bootstrap -------------------------------------------------------------------
-
-# irform.bootstrap.min.js
-process-stamp_bootstrapjs: OUTPUT := ../docs/dist/js/irform.bootstrap.min.js
-process-stamp_bootstrapjs: INPUT := $(BASE_SRCS) \
-	srcs/irform.bootstrap.js
-
-# Include sources
-concat-stamp_bootstrapjs: OUTPUT := ../docs/dist/js/irform.bootstrap.js
-concat-stamp_bootstrapjs: INPUT := $(BASE_SRCS) \
-	srcs/irform.bootstrap.js
-
-# irexplorer -------------------------------------------------------------------
-
-# irform.irexplorer.min.js
-process-stamp_irexplorerjs: OUTPUT := ../docs/dist/js/irform.irexplorer.min.js
-process-stamp_irexplorerjs: INPUT := $(BASE_SRCS) \
-	srcs/irform.irexplorer.js
-
-# Include sources
-concat-stamp_irexplorerjs: OUTPUT := ../docs/dist/js/irform.irexplorer.js
-concat-stamp_irexplorerjs: INPUT := $(BASE_SRCS) \
-	srcs/irform.irexplorer.js
+	theme/pure/main.scss
 
 # Stamp text to apply to each files
 STAMP_TXT = $(notdir $(OUTPUT)) (`date +'%Y.%m.%d'`) by Blaise Lengrand\n

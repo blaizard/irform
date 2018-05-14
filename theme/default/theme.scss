@@ -3,6 +3,7 @@
 %irform {
 	font-family: $font;
 	font-size: #{$fieldTextHeight}px;
+	vertical-align: bottom;
 	line-height: #{$fieldTextHeight}px;
 	margin: 0px;
 	box-sizing: border-box;
@@ -98,17 +99,11 @@
 }
 
 %hover {
-	border-color: #35a5e5;
-	box-shadow: 0 0 5px rgba(81, 203, 238, 1);
-	-webkit-box-shadow: 0 0 5px rgba(81, 203, 238, 1);
-	-moz-box-shadow: 0 0 5px rgba(81, 203, 238, 1);
+	@include hover;
 }
 
 %focus {
-	border-color: #35a5e5;
-	box-shadow: 0 0 5px rgba(81, 203, 238, 1);
-	-webkit-box-shadow: 0 0 5px rgba(81, 203, 238, 1);
-	-moz-box-shadow: 0 0 5px rgba(81, 203, 238, 1);
+	@include focus;
 }
 
 // Error specific

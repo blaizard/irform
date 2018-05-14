@@ -8,9 +8,7 @@ $switchWidth: $fieldHeight * 1.5; //48
 	margin: 3px 0;
 	background-color: transparent;
 	input[type=checkbox] {
-		position: absolute;
-		top: -99999px;
-		left: -99999px;
+		display: none;
 	}
 	label:before,
 	label:after {

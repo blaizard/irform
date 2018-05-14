@@ -6,8 +6,8 @@
 }
 
 .irform-modal-container {
-	background-color: $fieldBgColor;
-	color: $fieldTextColor;
+	background-color: $modalBgColor;
+	color: $modalTextColor;
 	max-width: 90%;
 	max-height: 90%;
 	min-width: 400px;
@@ -26,7 +26,6 @@
 	border: 0;
 	margin: 0;
 	padding: 0;
-	background-color: $fieldBgColor;
 	width: auto;
 	padding: 10px;
 	text-align: right;

@@ -26,8 +26,11 @@
 	@extend %multi-line;
 }
 
-.irform-elements {
+.irform-caption + .irform-elements {
 	padding-left: 10px;
+}
+
+.irform-elements {
 	width: 100%;
 }
 

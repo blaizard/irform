@@ -18,7 +18,7 @@
 
 		<script src="../srcs/jquery.irform-modal.js"></script>
 
-		<link rel="stylesheet" type="text/css" href="../dist/css/irform.min.css"/>
+		<link rel="stylesheet" type="text/css" href="../docs/dist/css/irform.min.css"/>
 
 		<script src="tinymce/js/tinymce/tinymce.min.js"></script>
 		<script src="ircom/ircom.js"></script>
@@ -29,9 +29,9 @@
 		<form id="dropDown"></form>
 		<script type="text/javascript">
 			var irform = new Irform("#dropDown", [
-				{name: "dropdown", caption: "Dropdown", type: "dropdown", list: ["hello", "world"], options: {selectMode: true}, width: "50%"},
-				{name: "dropdown", caption: "Dropdown", type: "dropdown", list: ["hello", "world"], options: {selectMode: false}, width: "50%"},
-				{name: "dropdown", caption: "Dropdown", type: "dropdown", list: ["hello", "world"], options: {editable: false}, width: "50%"},
+				{name: "dropdown", caption: "Dropdown", type: "dropdown", list: ["Hello", "World"], options: {selectMode: true}, width: "50%"},
+				{name: "dropdown", caption: "Dropdown", type: "dropdown", list: ["Hello", "World"], options: {selectMode: false}, width: "50%"},
+				{name: "dropdown", caption: "Dropdown", type: "dropdown", list: ["Hello", "World"], options: {editable: false}, width: "50%"},
 				{name: "dropdown", caption: "Dropdown", type: "dropdown", options: {
 					selectMode: false,
 					updateList: function(value) {
@@ -48,7 +48,30 @@
 						});
 					}
 				}, width: "50%"},
+				{name: "dropdown", caption: "Dropdown", type: "dropdown", list: {a: "Hello <1>", b: "World <2>"}, width: "50%"},
+				{name: "dropdown", caption: "Dropdown", type: "dropdown", list: {a: "<b>Hello</b>", b: "<span style='color: red;'>World</span>"}, options: {acceptHTML: true}, width: "50%"},
+				{name: "dropdown", type: "dropdown", list: ["Hello", "World"], width: "50%"},
+				{name: "input", type: "input", width: "50%"},
 			]);
+		</script>
+
+		<h1>Tags</h1>
+		<form id="tags"></form>
+		<button type="button" onclick="irformGet_tags()">Irform.get</button><br>
+
+		<script type="text/javascript">
+			var irformTags = new Irform("#tags", [
+				{name: "tags1", caption: "Normal", type: "tags"},
+				{name: "tags2", caption: "Normal (array)", type: "tags", isArray: true},
+				{name: "tags2", caption: "DropDown", type: "tags", template: [
+					{name: "keyword", type: "dropdown", width: "200px", list: ["hello", "world"]}
+				]},
+			]);
+
+			function irformGet_tags()
+			{
+				console.log(irformTags.get());
+			}
 		</script>
 
 		<h1>Drag Images</h1>
@@ -76,7 +99,9 @@
 		                {name: "repassword", caption: "Re-Enter Password", type: "password", required: true, validate: "password"},
 		            ]
 		        }},
-		        {type: "submit", value: "Ok"}
+		        {type: "submit", value: "Ok", callback: function(data) {
+		        	console.log(data);
+		        }}
 		    ]);
 		</script>
 
@@ -220,6 +245,7 @@
 					tags: "hello, world",
 					editor: "<b>hello</b> <i>world</i>!!!!",
 					switch: true,
+					checkbox3: "ddfs",
 					array: [
 						{checkbox: {hello: "selected"}},
 						{checkbox: {yes: "selected"}}

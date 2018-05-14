@@ -15,21 +15,33 @@
 	 * \type Array
 	 */
 	$.fn.irformArrayTags.defaults = {
-		template: "<span>" +
-						"<span class=\"irform-array-tags-edit\">" +
-							"<input type=\"text\" class=\"irform inline\" name=\"keyword\"/>" +
-						"</span>" +
-						"<span class=\"irform-array-tags-tag irform border inline clickable\" style=\"display: none;\">" +
-							"<span></span>" +
-							"<span class=\"irform-array-item-del\" style=\"margin-left: 10px;\"><span class=\"icon-cross\"></span></span>" +
-						"</span>" +
-					"</span>",
+		template: "<div>" +
+						"<div class=\"irform-array-tags-edit irform inline\"></div>" +
+						"<div class=\"irform-array-tags-tag irform border inline clickable\" style=\"display: none;\">" +
+							"<div class=\"irform-array-item-text\"></div>" +
+							"<div class=\"irform-array-item-del\" style=\"margin-left: 10px;\"><div class=\"icon-cross\"></div></div>" +
+						"</div>" +
+					"</div>",
+		templateInput: "<input type=\"text\" class=\"irform inline\" name=\"keyword\"/>",
 		isMove: false,
 		isDelete: false,
 		isDrag: true,
-		dragHandleSelector: ".irform-array-item .irform-array-tags-tag > span:not(.irform-array-item-del)",
+		isArray: false,
+		dragHandleSelector: ".irform-array-item .irform-array-tags-tag > div:not(.irform-array-item-del)",
 		inline: true,
 		hookAdd: function(item) {
+
+			var options = $(this).data("irformArray");
+
+			// Set the edit tag
+			var content = $(item).find(".irform-array-tags-edit:first");
+			if (typeof options.templateInput === "object") {
+				new Irform(content, options.templateInput);
+			}
+			else {
+				content.html($(options.templateInput).clone(true, true));
+			}
+
 			var obj = this;
 			var edit = $(item).find(".irform-array-tags-edit");
 			var tag = $(item).find(".irform-array-tags-tag");
@@ -43,7 +55,7 @@
 				else {
 					$(edit).hide();
 					// Show and update the tag
-					$(tag).find("span:first").text(value);
+					$(tag).find("div.irform-array-item-text").text(value);
 					$(tag).show();
 				}
 			}).on("change", function() {
@@ -74,22 +86,37 @@
 		 * Hook called once the element value is writen to it.
 		 */
 		hookValWrite: function(value) {
+			var options = $(this).data("irformArray");
+			if (options.isArray) {
+				return value.map(function(v) {
+					return {keyword: (v || "").trim()};
+				});
+			}
 			return value.split(",").map(function(v) {
-				return {keyword: v.trim()};
+				return {keyword: (v || "").trim()};
 			});
 		},
 		/**
 		 * Hook called once the element value is read.
 		 */
 		hookValRead: function(value) {
+			var options = $(this).data("irformArray");
+			if (options.isArray) {
+				return value.map(function(v) { return v.keyword; });
+			}
 			return value.map(function(v) { return v.keyword; }).join(", ");
 		}
 	};
 })(jQuery);
 
 /* Add the module to Irform */
-Irform.defaultOptions.fields.tags = function(name) {
+Irform.defaultOptions.fields.tags = function(name, options) {
 	var div = $("<div>");
-	div.irformArrayTags({name: name});
+	div.irformArrayTags({
+		name: name,
+		templateInput: options.template,
+		isArray: options.isArray,
+		isDrag: options.isDrag
+	});
 	return div;
 };

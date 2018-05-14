@@ -13,8 +13,8 @@ button.irform {
 	&:active {
 		background-color: #ccc;
 	}
-	background-color: $specialBgColor;
-	color: $specialTextColor;
+	background-color: $buttonBgColor;
+	color: $buttonTextColor;
 	text-align: center;
 	min-width: #{$fieldHeight}px;
 	padding: 0 8px;

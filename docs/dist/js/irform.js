@@ -1,4 +1,4 @@
-/* irform.js (2018.04.18) by Blaise Lengrand\n */
+/* irform.js (2018.05.14) by Blaise Lengrand\n */
 !function(n){n.irRequire||(n.irRequire=function(t,i){return new Promise(function(e,r){n.irRequire.a(t,e,r,i||3e4)})},n.irRequire.a=function(functionName,resolve,reject,timeout){"string"==typeof functionName&&(functionName=[functionName]);var ready=1,poll=1;if(functionName.forEach(function(name){try{if(void 0===eval(name))throw 1;n.irRequire.h(name)}catch(e){ready=0;var m=irRequire.map;for(m[name]instanceof Array||(m[name]=m[name]?[m[name]]:[]);m[name].length;){var url=m[name].shift();if(m[url])return poll=0,irRequire(url,timeout).then(function(){irRequire.a(functionName,resolve,reject,timeout)});n.irRequire.h(name,url);var desc=0<=url.search(/\.css$/i)?["link","href",{rel:"stylesheet",type:"text/css"}]:["script","src",{type:"text/javascript",async:!0}],d=document;if(!d.querySelector(desc[0]+"["+desc[1]+'="'+url+'"]')){var elt=d.createElement(desc[0]);elt[desc[1]]=url,Object.assign(elt,desc[2]),elt.onerror=function(){reject(new Error("cannot load "+(elt.src||elt.href)))},d.getElementsByTagName("head")[0].appendChild(elt)}}}}),ready){var r=functionName.map(function(name){return eval(name)});resolve(1==r.length?r[0]:r)}else poll&&(0<timeout?setTimeout(function(){irRequire.a(functionName,resolve,reject,timeout-100)},100):reject(new Error(functionName.join()+" timed-out")))},n.irRequire.map={},n.irRequire.h=function(){})}(window);/**
  * \brief Manipulate and create dynamic forms.
  *
@@ -19,10 +19,17 @@ var Irform = function (container, formDescription, options) {
 	this.container.empty();
 	// Set the class
 	this.container.addClass("irform-layout");
+	// Add the events
+	this.events = {};
 	// Call the hook
 	this.options.hookInit.call(this);
 	// Create the form
 	this.create(container, formDescription);
+	// Add event to the container
+	var obj = this;
+	this.container.on("focus", ".irform", function() {
+		obj.trigger("focus", this);
+	});
 };
 
 /**
@@ -119,7 +126,8 @@ Irform.defaultOptions = {
 		},
 		switch: function(name/*, options*/) {
 			var container = $("<div>", {
-				class: "irform irform-switch"
+				class: "irform irform-switch",
+				tabIndex: "0"
 			});
 			var input = $("<input>", {
 				type: "checkbox",
@@ -325,6 +333,30 @@ Irform.findNameHolder = function (elt, name) {
 		name = ($(elt).hasClass("irform-item")) ? $(elt).attr("data-irform") : null;
 	}
 	return $(elt).find("[name" + ((name) ? ("=" + name) : "") + "]").addBack("[name" + ((name) ? ("=" + name) : "") + "]").first();
+}
+
+/**
+ * \brief Register an event
+ *
+ * \param id The identifier of the event
+ * \param callback The function to be called when the event is triggered
+ */
+Irform.prototype.on = function (id, callback) {
+	this.events.hasOwnProperty(id) || (this.events[id] = []);
+	this.events[id].push(callback);
+}
+
+/**
+ * \brief Trigger all events associated with a specific id
+ *
+ * \param id The identifier of the events to be triggered
+ * \param ... Arguments to be passed to the event callbacks
+ */
+Irform.prototype.trigger = function (id) {
+	var args = Array.prototype.slice.call(arguments, 1);
+	for (var i in this.events[id]) {
+		this.events[id][i].apply(this, args);
+	}
 }
 
 /**
@@ -1519,21 +1551,33 @@ Irform.defaultOptions.fields.array = function(name, options) {
 	 * \type Array
 	 */
 	$.fn.irformArrayTags.defaults = {
-		template: "<span>" +
-						"<span class=\"irform-array-tags-edit\">" +
-							"<input type=\"text\" class=\"irform inline\" name=\"keyword\"/>" +
-						"</span>" +
-						"<span class=\"irform-array-tags-tag irform border inline clickable\" style=\"display: none;\">" +
-							"<span></span>" +
-							"<span class=\"irform-array-item-del\" style=\"margin-left: 10px;\"><span class=\"icon-cross\"></span></span>" +
-						"</span>" +
-					"</span>",
+		template: "<div>" +
+						"<div class=\"irform-array-tags-edit irform inline\"></div>" +
+						"<div class=\"irform-array-tags-tag irform border inline clickable\" style=\"display: none;\">" +
+							"<div class=\"irform-array-item-text\"></div>" +
+							"<div class=\"irform-array-item-del\" style=\"margin-left: 10px;\"><div class=\"icon-cross\"></div></div>" +
+						"</div>" +
+					"</div>",
+		templateInput: "<input type=\"text\" class=\"irform inline\" name=\"keyword\"/>",
 		isMove: false,
 		isDelete: false,
 		isDrag: true,
-		dragHandleSelector: ".irform-array-item .irform-array-tags-tag > span:not(.irform-array-item-del)",
+		isArray: false,
+		dragHandleSelector: ".irform-array-item .irform-array-tags-tag > div:not(.irform-array-item-del)",
 		inline: true,
 		hookAdd: function(item) {
+
+			var options = $(this).data("irformArray");
+
+			// Set the edit tag
+			var content = $(item).find(".irform-array-tags-edit:first");
+			if (typeof options.templateInput === "object") {
+				new Irform(content, options.templateInput);
+			}
+			else {
+				content.html($(options.templateInput).clone(true, true));
+			}
+
 			var obj = this;
 			var edit = $(item).find(".irform-array-tags-edit");
 			var tag = $(item).find(".irform-array-tags-tag");
@@ -1547,7 +1591,7 @@ Irform.defaultOptions.fields.array = function(name, options) {
 				else {
 					$(edit).hide();
 					// Show and update the tag
-					$(tag).find("span:first").text(value);
+					$(tag).find("div.irform-array-item-text").text(value);
 					$(tag).show();
 				}
 			}).on("change", function() {
@@ -1578,23 +1622,38 @@ Irform.defaultOptions.fields.array = function(name, options) {
 		 * Hook called once the element value is writen to it.
 		 */
 		hookValWrite: function(value) {
+			var options = $(this).data("irformArray");
+			if (options.isArray) {
+				return value.map(function(v) {
+					return {keyword: (v || "").trim()};
+				});
+			}
 			return value.split(",").map(function(v) {
-				return {keyword: v.trim()};
+				return {keyword: (v || "").trim()};
 			});
 		},
 		/**
 		 * Hook called once the element value is read.
 		 */
 		hookValRead: function(value) {
+			var options = $(this).data("irformArray");
+			if (options.isArray) {
+				return value.map(function(v) { return v.keyword; });
+			}
 			return value.map(function(v) { return v.keyword; }).join(", ");
 		}
 	};
 })(jQuery);
 
 /* Add the module to Irform */
-Irform.defaultOptions.fields.tags = function(name) {
+Irform.defaultOptions.fields.tags = function(name, options) {
 	var div = $("<div>");
-	div.irformArrayTags({name: name});
+	div.irformArrayTags({
+		name: name,
+		templateInput: options.template,
+		isArray: options.isArray,
+		isDrag: options.isDrag
+	});
 	return div;
 };
 (function($) {
@@ -1772,7 +1831,8 @@ Irform.defaultOptions.fields.images = function(name) {
 		// Create the input field
 		var input = $("<div>", {
 			contenteditable: options.editable,
-			class: ((options.selectMode) ? "irform-dropdown-select" : "irform-dropdown-input")
+			tabindex: "0", // This is compatible with HTML5 and is a must to enable tabs on this element
+			class: "irform " + ((options.selectMode) ? "irform-dropdown-select" : "irform-dropdown-input")
 		});
 		$(container).append(input);
 
@@ -1782,7 +1842,8 @@ Irform.defaultOptions.fields.images = function(name) {
 		});
 		// Add onclick event
 		$(menu).on("click", ".irform-dropdown-item", function() {
-			$(input).text($(this).text()).trigger("change");
+			$(input).html($(this).html());
+			$(inputValue).val($(this).attr("data-value"));
 			$(menu).hide();
 		});
 		$(menu).on("mousedown touchstart", function(e) {
@@ -1798,8 +1859,13 @@ Irform.defaultOptions.fields.images = function(name) {
 		}
 
 		// Update the value when the input change
-		$(input).on("blur keyup paste copy cut mouseup change", function() {
+		$(input).on("keyup paste cut", function() {
 			$(inputValue).val($(this).text());
+		});
+
+		// Update the input when value change
+		$(inputValue).on("change", function() {
+			$(input).text($(this).val());
 		});
 
 		// Add events
@@ -1809,7 +1875,7 @@ Irform.defaultOptions.fields.images = function(name) {
 			var ret = options.updateList.call(this, value);
 			var action = function(list) {
 
-				if (list && list instanceof Array) {
+				if (list) {
 					$.fn.irformDropdown.setList.call(obj, list);
 				}
 
@@ -1817,9 +1883,9 @@ Irform.defaultOptions.fields.images = function(name) {
 				var matchList = [];
 				var filter = value.toLowerCase();
 				$(obj).data("irformDropdown-list").forEach(function(data) {
-					var weight = (isClick) ? 1 : $.fn.irformDropdown.search(filter, data[1], options.minWeight);
+					var weight = (isClick) ? 1 : $.fn.irformDropdown.search(filter, data[0], options.minWeight);
 					if (weight > 0) {
-						matchList.push([weight, data[0]]);
+						matchList.push([weight, data[1], data[2]]);
 					}
 				});
 
@@ -1833,7 +1899,13 @@ Irform.defaultOptions.fields.images = function(name) {
 					var item = $("<div>", {
 						class: "irform-dropdown-item"
 					});
-					item.text(data[1]);
+					$(item).attr("data-value", data[1]);
+					if (options.acceptHTML) {
+						item.html(data[2]);
+					}
+					else {
+						item.text(data[2])
+					}
 					$(menu).append(item);
 				});
 			};
@@ -1890,10 +1962,22 @@ Irform.defaultOptions.fields.images = function(name) {
 	 * \brief Set a filter on the list
 	 */
 	$.fn.irformDropdown.setList = function(list) {
+		var options = $(this).data("irformDropdown");
+		var toValue = (options.acceptHTML) ? function(a) { return $("<span/>").html(a).text() } : function(a) { return a };
+
 		var updatedList = [];
-		list.forEach(function(item) {
-			updatedList.push([item, item.toLowerCase()]);
-		});
+		if (list instanceof Array) {
+			list.forEach(function(item) {
+				var value = toValue(item);
+				// search value, value, display value
+				updatedList.push([value.toLowerCase(), value, item]);
+			});
+		}
+		else {
+			for (var value in list) {
+				updatedList.push([toValue(list[value]).toLowerCase(), value, list[value]]);
+			}
+		}
 		$(this).data("irformDropdown-list", updatedList);
 	};
 
@@ -1908,11 +1992,35 @@ Irform.defaultOptions.fields.images = function(name) {
 		 * The name of the element, this must be set
 		 */
 		name: "dropdown",
+		/**
+		 * Make the field freely editable
+		 */
 		editable: true,
+		/**
+		 * For the fuzzy search, the minimum weight to which the items must match
+		 */
 		minWeight: 0.6,
+		/**
+		 * The maximum number of results to be shown
+		 */
 		maxResults: 10,
+		/**
+		 * Make it like a select box, hence when the user clicks on the field,
+		 * it will show the dropdown list
+		 */
 		selectMode: true,
+		/**
+		 * Set to true, if the input should be considered as plain HTML. False if it
+		 * should be considered as text.
+		 */
+		acceptHTML: false,
+		/**
+		 * Callback for loading data on the fly
+		 */
 		updateList: function(value) {},
+		/**
+		 * Set this value to set the initial content
+		 */
 		list: []
 	};
 

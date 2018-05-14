@@ -18,10 +18,17 @@ var Irform = function (container, formDescription, options) {
 	this.container.empty();
 	// Set the class
 	this.container.addClass("irform-layout");
+	// Add the events
+	this.events = {};
 	// Call the hook
 	this.options.hookInit.call(this);
 	// Create the form
 	this.create(container, formDescription);
+	// Add event to the container
+	var obj = this;
+	this.container.on("focus", ".irform", function() {
+		obj.trigger("focus", this);
+	});
 };
 
 /**
@@ -118,7 +125,8 @@ Irform.defaultOptions = {
 		},
 		switch: function(name/*, options*/) {
 			var container = $("<div>", {
-				class: "irform irform-switch"
+				class: "irform irform-switch",
+				tabIndex: "0"
 			});
 			var input = $("<input>", {
 				type: "checkbox",
@@ -324,6 +332,30 @@ Irform.findNameHolder = function (elt, name) {
 		name = ($(elt).hasClass("irform-item")) ? $(elt).attr("data-irform") : null;
 	}
 	return $(elt).find("[name" + ((name) ? ("=" + name) : "") + "]").addBack("[name" + ((name) ? ("=" + name) : "") + "]").first();
+}
+
+/**
+ * \brief Register an event
+ *
+ * \param id The identifier of the event
+ * \param callback The function to be called when the event is triggered
+ */
+Irform.prototype.on = function (id, callback) {
+	this.events.hasOwnProperty(id) || (this.events[id] = []);
+	this.events[id].push(callback);
+}
+
+/**
+ * \brief Trigger all events associated with a specific id
+ *
+ * \param id The identifier of the events to be triggered
+ * \param ... Arguments to be passed to the event callbacks
+ */
+Irform.prototype.trigger = function (id) {
+	var args = Array.prototype.slice.call(arguments, 1);
+	for (var i in this.events[id]) {
+		this.events[id][i].apply(this, args);
+	}
 }
 
 /**

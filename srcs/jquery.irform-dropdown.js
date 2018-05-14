@@ -95,7 +95,8 @@
 		// Create the input field
 		var input = $("<div>", {
 			contenteditable: options.editable,
-			class: ((options.selectMode) ? "irform-dropdown-select" : "irform-dropdown-input")
+			tabindex: "0", // This is compatible with HTML5 and is a must to enable tabs on this element
+			class: "irform " + ((options.selectMode) ? "irform-dropdown-select" : "irform-dropdown-input")
 		});
 		$(container).append(input);
 
@@ -105,7 +106,8 @@
 		});
 		// Add onclick event
 		$(menu).on("click", ".irform-dropdown-item", function() {
-			$(input).text($(this).text()).trigger("change");
+			$(input).html($(this).html());
+			$(inputValue).val($(this).attr("data-value"));
 			$(menu).hide();
 		});
 		$(menu).on("mousedown touchstart", function(e) {
@@ -121,8 +123,13 @@
 		}
 
 		// Update the value when the input change
-		$(input).on("blur keyup paste copy cut mouseup change", function() {
+		$(input).on("keyup paste cut", function() {
 			$(inputValue).val($(this).text());
+		});
+
+		// Update the input when value change
+		$(inputValue).on("change", function() {
+			$(input).text($(this).val());
 		});
 
 		// Add events
@@ -132,7 +139,7 @@
 			var ret = options.updateList.call(this, value);
 			var action = function(list) {
 
-				if (list && list instanceof Array) {
+				if (list) {
 					$.fn.irformDropdown.setList.call(obj, list);
 				}
 
@@ -140,9 +147,9 @@
 				var matchList = [];
 				var filter = value.toLowerCase();
 				$(obj).data("irformDropdown-list").forEach(function(data) {
-					var weight = (isClick) ? 1 : $.fn.irformDropdown.search(filter, data[1], options.minWeight);
+					var weight = (isClick) ? 1 : $.fn.irformDropdown.search(filter, data[0], options.minWeight);
 					if (weight > 0) {
-						matchList.push([weight, data[0]]);
+						matchList.push([weight, data[1], data[2]]);
 					}
 				});
 
@@ -156,7 +163,13 @@
 					var item = $("<div>", {
 						class: "irform-dropdown-item"
 					});
-					item.text(data[1]);
+					$(item).attr("data-value", data[1]);
+					if (options.acceptHTML) {
+						item.html(data[2]);
+					}
+					else {
+						item.text(data[2])
+					}
 					$(menu).append(item);
 				});
 			};
@@ -213,10 +226,22 @@
 	 * \brief Set a filter on the list
 	 */
 	$.fn.irformDropdown.setList = function(list) {
+		var options = $(this).data("irformDropdown");
+		var toValue = (options.acceptHTML) ? function(a) { return $("<span/>").html(a).text() } : function(a) { return a };
+
 		var updatedList = [];
-		list.forEach(function(item) {
-			updatedList.push([item, item.toLowerCase()]);
-		});
+		if (list instanceof Array) {
+			list.forEach(function(item) {
+				var value = toValue(item);
+				// search value, value, display value
+				updatedList.push([value.toLowerCase(), value, item]);
+			});
+		}
+		else {
+			for (var value in list) {
+				updatedList.push([toValue(list[value]).toLowerCase(), value, list[value]]);
+			}
+		}
 		$(this).data("irformDropdown-list", updatedList);
 	};
 
@@ -231,11 +256,35 @@
 		 * The name of the element, this must be set
 		 */
 		name: "dropdown",
+		/**
+		 * Make the field freely editable
+		 */
 		editable: true,
+		/**
+		 * For the fuzzy search, the minimum weight to which the items must match
+		 */
 		minWeight: 0.6,
+		/**
+		 * The maximum number of results to be shown
+		 */
 		maxResults: 10,
+		/**
+		 * Make it like a select box, hence when the user clicks on the field,
+		 * it will show the dropdown list
+		 */
 		selectMode: true,
+		/**
+		 * Set to true, if the input should be considered as plain HTML. False if it
+		 * should be considered as text.
+		 */
+		acceptHTML: false,
+		/**
+		 * Callback for loading data on the fly
+		 */
 		updateList: function(value) {},
+		/**
+		 * Set this value to set the initial content
+		 */
 		list: []
 	};
 

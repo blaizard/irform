@@ -69,9 +69,16 @@
 /* Tags specific */
 .irform-array-tags-tag {
 	background-color: $fieldBgColor;
+	white-space: nowrap;
+
+	.irform-array-item-text {
+		display: inline-block;
+		vertical-align: bottom;
+	}
 
 	.irform-array-item-del {
 		display: inline-block;
+		vertical-align: bottom;
 		@extend %clickable-text;
 	}
 }
